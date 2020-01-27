@@ -1,12 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using PathfindingEngine;
 
+[RequireComponent(typeof(Pathfinding))]
 public class PathfindingManager : SingletonMonoBehaviour<PathfindingManager>
 {
+    private Pathfinding _pathfinding;
+
     private Queue<PathRequest> _pathRequestsQueue = new Queue<PathRequest>();
     private PathRequest _activePathRequest;
     private bool _isCalculatingPath;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        _pathfinding = GetComponent<Pathfinding>();
+    }
 
     public static void RequestPath(Vector3 startPosition, Vector3 targetPosition, Action<List<Node>> callback)
     {
@@ -23,7 +34,7 @@ public class PathfindingManager : SingletonMonoBehaviour<PathfindingManager>
             _activePathRequest = _pathRequestsQueue.Dequeue();
             _isCalculatingPath = true;
 
-            Pathfinding.Instance.FindPath(_activePathRequest.startPosition, _activePathRequest.targetPosition, OnCalculationFinished);
+            _pathfinding.FindPath(_activePathRequest.startPosition, _activePathRequest.targetPosition, OnCalculationFinished);
         }
     }
 

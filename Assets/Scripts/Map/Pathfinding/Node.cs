@@ -6,6 +6,7 @@ public class Node : IHeapItem<Node>
     public bool Walkable { get; private set; }
     public int Penalty { get; private set; }
     public Vector3 WorldPosition { get; private set; }
+    public Vector3Int TilemapPosition { get; private set; } 
     #endregion
 
     #region Grid properties
@@ -25,9 +26,10 @@ public class Node : IHeapItem<Node>
 
     public int HeapIndex { get; set; }
 
-    public Node(Vector3 worldPosition, Vector2Int gridPosition, bool isWalkable, int penalty)
+    public Node(Vector3 worldPosition, Vector3Int tilemapPosition, Vector2Int gridPosition, bool isWalkable, int penalty)
     {
         WorldPosition = worldPosition;
+        TilemapPosition = tilemapPosition;
         Walkable = isWalkable;
         Penalty = penalty;
         GridPosition = gridPosition;

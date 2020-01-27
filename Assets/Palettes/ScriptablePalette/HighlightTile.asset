@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec90fe1233d1e3142a8a246e5aba1677, type: 3}
-  m_Name: Rock
+  m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: HighlightTile
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: 6993ce0c6d9f46c48bc8611c06a2ad88, type: 3}
-  m_Color: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+  m_Sprite: {fileID: 21300000, guid: aa318d592c9f5ac4c90f67a485b0e0a3, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
     e01: 0
@@ -34,5 +34,3 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
-  _isWalkable: 0
-  _penalty: 0
