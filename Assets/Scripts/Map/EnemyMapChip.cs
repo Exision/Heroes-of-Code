@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyUnit : Unit
+public class EnemyMapChip : MapChip
 {
     public void RequestRandomPath()
     {

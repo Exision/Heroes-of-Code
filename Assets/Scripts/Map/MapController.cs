@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class MapController : SingletonMonoBehaviour<MapController>
 {
-    [SerializeField] private PlayerUnit _player;
+    [SerializeField] private PlayerMapChip _player;
     [SerializeField] private InterfaceController _interfaceController;
-    [SerializeField] private UnitsController _unitsController;
+    [SerializeField] private MapChipManager _unitsController;
 
-    private E_MapGameState _currentGameState;
+    public E_MapGameState CurrentGameState { get; private set; }
     private WaitForSeconds _coroutineHalfSecond = new WaitForSeconds(0.5f);
 
     private void OnEnable()
@@ -27,15 +27,13 @@ public class MapController : SingletonMonoBehaviour<MapController>
     private void Start()
     {
         ChangeGameState(E_MapGameState.Waiting);
-
-        _unitsController.Init(_player);
     }
 
     private void ChangeGameState(E_MapGameState newGameState)
     {
-        _currentGameState = newGameState;
+        CurrentGameState = newGameState;
 
-        switch (_currentGameState)
+        switch (CurrentGameState)
         {
             case E_MapGameState.Moving:
                 StartCoroutine(UnitsMoving());
@@ -52,6 +50,17 @@ public class MapController : SingletonMonoBehaviour<MapController>
         {
             _player.Move();
 
+            _unitsController.TryMoveUnits();
+            
+            if (_unitsController.IsNeighbour(_player.transform.position))
+            {
+                ChangeGameState(E_MapGameState.Waiting);
+
+                StartFight();
+
+                yield break;
+            }
+
             yield return _coroutineHalfSecond;
         }
 
@@ -60,19 +69,22 @@ public class MapController : SingletonMonoBehaviour<MapController>
         yield break;
     }
 
+    private void StartFight()
+    {
+
+    }
+
     private void OnPositionSelected(Vector3 worldPosition)
     {
-        switch (_currentGameState)
+        switch (CurrentGameState)
         {
             case E_MapGameState.Waiting:
                 {
-                    List<Node> path = new List<Node>();
-
                     PathfindingManager.RequestPath(_player.transform.position,
                         worldPosition,
                         (List<Node> resultPath) =>
                         {
-                            path = resultPath;
+                            List<Node> path = resultPath;
 
                             if (_player.Path != null && path != null && System.Linq.Enumerable.SequenceEqual(_player.Path, path))
                                 ChangeGameState(E_MapGameState.Moving);

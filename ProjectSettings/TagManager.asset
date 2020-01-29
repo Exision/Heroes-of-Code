@@ -41,3 +41,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: UI Window
+    uniqueID: 2925427789
+    locked: 0

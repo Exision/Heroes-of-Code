@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+public class MapChip : MonoBehaviour
 {
     public List<Node> Path { get; protected set; }
 
