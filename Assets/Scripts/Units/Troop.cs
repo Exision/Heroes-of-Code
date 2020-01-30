@@ -5,11 +5,8 @@ using UnityEngine;
 public class Troop : ITroop
 {
     public UnitStats UnitStats { get; set; }
-
     public int UnitsCount { get; set; }
-
     public int CurrentHealth { get; set; }
-
     public int CurrentDamage { get; set; }
 
 

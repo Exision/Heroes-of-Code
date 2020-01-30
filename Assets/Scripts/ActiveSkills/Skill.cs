@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ActiveSkill", menuName = "ScriptableObject/ActiveSkill", order = 1)]
-public class Skill : ScriptableObject, ISkill
+public abstract class Skill : ScriptableObject
 {
-    [SerializeField] private int _id;
-    [SerializeField] private float _usePower;
-    [SerializeField] private ISkillUse _skillUseType;
+    [SerializeField] protected int _id;
+    [SerializeField] protected float _usePower;
+    [SerializeField] protected int _skillPower;
 
-    public float UsePowerModificator => _usePower;
+    public int Id => _id;
+    public float Modificator => _usePower;
+    public int Power => _skillPower;
 
-
-    public void Use(Troop[] targets, float usePower)
-    {
-        _skillUseType.Use(targets, usePower);
-    }
+    public abstract void Use(Troop[] targets, float usePower);
 }

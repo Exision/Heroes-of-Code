@@ -10,7 +10,7 @@ public class UnitCell : MonoBehaviour
 
     [SerializeField] private Text _unitNameText;
     [SerializeField] private Image _unitIcon;
-    [SerializeField] private Text _inputFieldText;
+    [SerializeField] private InputField _inputField;
 
     private UnitStats _unit;
 
@@ -18,13 +18,13 @@ public class UnitCell : MonoBehaviour
     {
         _unit = unit;
 
-        _unitNameText.text = Localization.Instance.Get(_unit.unitName);
-        _unitIcon.sprite = Resources.Load<Sprite>($"Sprites/{_unit.unitName}Icon");
+        _unitNameText.text = Localization.Instance.Get("unit_name_" + _unit.id);
+        _unitIcon.sprite = Resources.Load<Sprite>($"{GameConfig.Instance.resourcesSpritesPath}UnitIcon_{_unit.id}");
     }
 
-    public void OnValueChanged(string text)
+    public void OnValueChanged()
     {
-        if (int.TryParse(text, out int count))
+        if (int.TryParse(_inputField.text, out int count))
             onValueChanged?.Invoke(_unit.id, count);
     }
 }

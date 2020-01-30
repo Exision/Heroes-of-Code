@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb1ae7a5bedaf164a8042096eb7ae75f, type: 3}
-  m_Name: GameConfig
+  m_Script: {fileID: 11500000, guid: 98cf9cf02f88d47448a6a2eb4efbf855, type: 3}
+  m_Name: Archer
   m_EditorClassIdentifier: 
-  enemysCount: 3
-  unitSpeed: 20
-  unitChanceToFindPath: 0.25
-  resourcesSpritesPath: Sprites/
+  id: 1
+  unitName: archer
+  health: 50
+  attackPower: 100
+  skills: []

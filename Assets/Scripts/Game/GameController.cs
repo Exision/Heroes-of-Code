@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class GameController : SingletonMonoBehaviour<GameController>
 {
-    [SerializeField] private UnitsManager _unitsManager;
+    [SerializeField] private UnitsStorage _unitsStorage;
 
-    public UnitsManager UnitsManager => _unitsManager;
+    public UnitsStorage UnitsStorage => _unitsStorage;
 
-    private PlayerData _playerData;
+    public PlayerData PlayerData { get; private set; }
+
+    public Dictionary<int, List<Troop>> EnemysDatas { get; private set; } = new Dictionary<int, List<Troop>>();
 
     protected override void Awake()
     {
@@ -23,10 +25,40 @@ public class GameController : SingletonMonoBehaviour<GameController>
         createGroupWindow.onGroupReady = (Dictionary<int, int> group) =>
         {
             createGroupWindow.Hide();
+
+            PlayerData = new PlayerData(group);
+
+            GenerateEnemys();
+
+            SceneLoader.Instance.LoadScene(GameConfig.MAP_SCENE_PATH);
         };
         createGroupWindow.Show();
+    }
 
+    private void GenerateEnemys()
+    {
+        for (int loop = 0; loop < GameConfig.Instance.enemysCount; loop++)
+        {
+            int enemyTroopsCount = Random.Range(1, _unitsStorage.Units.Length);
+            List<UnitStats> allTroops = new List<UnitStats>(_unitsStorage.Units);
+            List<Troop> troops = new List<Troop>();
 
+            for (int troopIndex = 0; troopIndex < enemyTroopsCount; troopIndex++)
+            {
+                int randomTroopIndex = Random.Range(0, allTroops.Count);
+                Troop troop = new Troop(allTroops[randomTroopIndex], Random.Range(1, 200));
+
+                troops.Add(troop);
+                allTroops.Remove(allTroops[randomTroopIndex]);
+            }
+
+            EnemysDatas.Add(loop, troops);
+        }
+    }
+
+    public void StartFight(int enemyGroup)
+    {
+        Debug.Log($"Fight with enemy {enemyGroup}, troops count {EnemysDatas[enemyGroup].Count}, first is {EnemysDatas[enemyGroup][0].UnitStats.id}");
     }
 
     [ContextMenu("Show Window")]

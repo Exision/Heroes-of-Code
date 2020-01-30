@@ -1,14 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Window : MonoBehaviour
 {
-    public System.Action onEndShowAnimation;
-    public System.Action onEndHideAnimation;
+    public Action onEndShowAnimation;
+    public Action onEndHideAnimation;
+    public Action onClickCloseButton;
 
-    [SerializeField] Animator animator;
+    [SerializeField] private Animator _animator;
 
     int showHash = Animator.StringToHash("ShowAnimation");
     int hideHash = Animator.StringToHash("HideAnimation");
@@ -23,21 +24,18 @@ public class Window : MonoBehaviour
 
     public virtual void Show(bool animation = true)
     {
-        if (gameObject.activeSelf)
-            return;
-
         gameObject.SetActive(true);
 
-        if (animator != null)
-            animator.enabled = false;
+        if (_animator != null)
+            _animator.enabled = false;
         else
             animation = false;
 
         if (animation)
         {
-            animator.enabled = true;
-            animator.Play(showHash, -1, 0.0f);
-            animator.Update(0.0f);
+            _animator.enabled = true;
+            _animator.Play(showHash, -1, 0.0f);
+            _animator.Update(0.0f);
         }
         else
             OnEndShowAnimation();
@@ -45,14 +43,14 @@ public class Window : MonoBehaviour
 
     public virtual void Hide(bool animation = true)
     {
-        if (animator == null)
+        if (_animator == null)
             animation = false;
 
         if (animation)
         {
-            animator.enabled = true;
-            animator.Play(hideHash, -1, 0.0f);
-            animator.Update(0.0f);
+            _animator.enabled = true;
+            _animator.Play(hideHash, -1, 0.0f);
+            _animator.Update(0.0f);
         }
         else
             OnEndHideAnimation();
@@ -62,21 +60,26 @@ public class Window : MonoBehaviour
 
     public virtual void OnEndShowAnimation()
     {
-        if (animator != null)
-            animator.enabled = false;
+        if (_animator != null)
+            _animator.enabled = false;
 
         onEndShowAnimation?.Invoke();
     }
 
     public virtual void OnEndHideAnimation()
     {
-        if (animator != null)
-            animator.enabled = false;
+        if (_animator != null)
+            _animator.enabled = false;
 
         gameObject.SetActive(false);
 
         onEndHideAnimation?.Invoke();
 
         onEndHideAnimation = null;
+    }
+
+    public virtual void OnClickCloseButton()
+    {
+        onClickCloseButton?.Invoke();
     }
 }

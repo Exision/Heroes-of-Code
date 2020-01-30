@@ -9,7 +9,6 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
     protected override void Awake()
     {
         base.Awake();
-
     }
 
     public T GetWindow<T>() where T: Window

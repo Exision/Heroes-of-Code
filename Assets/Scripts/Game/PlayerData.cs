@@ -5,19 +5,19 @@ using UnityEngine;
 
 public class PlayerData
 {
-    public Action<UnitStats> onUnitAttacked;
-    public Action<UnitStats> onUnitDead;
+    public List<Troop> Group { get; private set; } = new List<Troop>();
 
-    public List<Troop> Group { get; private set; }
-
-    public void Init(Dictionary<int, int> group)
+    public PlayerData(Dictionary<int, int> group)
     {
-        foreach (KeyValuePair<int,int> item in group)
+        if (group.Count > 0)
         {
-            Troop unit = new Troop(GameController.Instance.UnitsManager.Units[item.Key], item.Value);
+            foreach (KeyValuePair<int, int> item in group)
+            {
+                Troop unit = new Troop(GameController.Instance.UnitsStorage.Units[item.Key], item.Value);
 
-            if (!Group.Contains(unit))
-                Group.Add(unit);
+                if (!Group.Contains(unit))
+                    Group.Add(unit);
+            }
         }
     }
 }

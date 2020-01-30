@@ -6,7 +6,6 @@ using UnityEngine;
 public class UnitStats : ScriptableObject
 {
     [SerializeField] public int id;
-    [SerializeField] public string unitName;
     [SerializeField] public int health;
     [SerializeField] public int attackPower;
     [SerializeField] public Skill[] skills;
