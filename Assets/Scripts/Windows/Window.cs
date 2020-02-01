@@ -56,6 +56,8 @@ public class Window : MonoBehaviour
             OnEndHideAnimation();
 
         onEndShowAnimation = null;
+
+        Destroy(gameObject);
     }
 
     public virtual void OnEndShowAnimation()

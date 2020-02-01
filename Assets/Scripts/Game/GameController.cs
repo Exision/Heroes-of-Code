@@ -12,6 +12,8 @@ public class GameController : SingletonMonoBehaviour<GameController>
 
     public Dictionary<int, List<Troop>> EnemysDatas { get; private set; } = new Dictionary<int, List<Troop>>();
 
+    public int CurrentEnemy { get; private set; }
+
     protected override void Awake()
     {
         base.Awake();
@@ -39,7 +41,7 @@ public class GameController : SingletonMonoBehaviour<GameController>
     {
         for (int loop = 0; loop < GameConfig.Instance.enemysCount; loop++)
         {
-            int enemyTroopsCount = Random.Range(1, _unitsStorage.Units.Length);
+            int enemyTroopsCount = Random.Range(1, _unitsStorage.Units.Length + 1);
             List<UnitStats> allTroops = new List<UnitStats>(_unitsStorage.Units);
             List<Troop> troops = new List<Troop>();
 
@@ -52,20 +54,23 @@ public class GameController : SingletonMonoBehaviour<GameController>
                 allTroops.Remove(allTroops[randomTroopIndex]);
             }
 
+            Debug.Log($"Enemy id: {loop}, enemy troops count: {troops.Count}");
+
             EnemysDatas.Add(loop, troops);
         }
     }
 
     public void StartFight(int enemyGroup)
     {
-        Debug.Log($"Fight with enemy {enemyGroup}, troops count {EnemysDatas[enemyGroup].Count}, first is {EnemysDatas[enemyGroup][0].UnitStats.id}");
-    }
-
-    [ContextMenu("Show Window")]
-    private void ShowWindow()
-    {
         MessageWindow messageWindow = WindowManager.Instance.GetWindow<MessageWindow>();
-        messageWindow.onClickOkButton = () => messageWindow.Hide();
-        messageWindow.Show("rer");
+        messageWindow.onClickOkButton = () =>
+        {
+            messageWindow.Hide();
+
+            CurrentEnemy = enemyGroup;
+
+            SceneLoader.Instance.LoadScene(GameConfig.BATTLE_SCENE_PATH);
+        };
+        messageWindow.Show($"Fight with enemy {enemyGroup}, troops count {EnemysDatas[enemyGroup].Count}, first is {EnemysDatas[enemyGroup][0].UnitStats.id}");
     }
 }

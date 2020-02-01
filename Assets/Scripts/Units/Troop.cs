@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Troop : ITroop
+public class Troop : MonoBehaviour, ITroop
 {
     public UnitStats UnitStats { get; set; }
     public int UnitsCount { get; set; }
@@ -38,5 +38,13 @@ public class Troop : ITroop
     {
         UnitsCount = Mathf.CeilToInt(CurrentHealth / UnitStats.health);
         CurrentDamage = UnitsCount * UnitStats.attackPower;
+    }
+
+    public override bool Equals(object other)
+    {
+        if (other == null || !this.GetType().Equals(other.GetType()))
+            return false;
+
+        return UnitStats.id == (other as Troop).UnitStats.id;
     }
 }

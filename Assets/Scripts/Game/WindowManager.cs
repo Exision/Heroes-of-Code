@@ -4,30 +4,19 @@ using UnityEngine;
 
 public class WindowManager : SingletonMonoBehaviour<WindowManager>
 {
-    private List<Window> _windows = new List<Window>();
+    [SerializeField] private Canvas _mainCanvas;
 
     protected override void Awake()
     {
         base.Awake();
+
+        DontDestroyOnLoad(gameObject);
     }
 
     public T GetWindow<T>() where T: Window
     {
-        foreach (Window window in _windows)
-        {
-            if (window is T)
-                if (window.gameObject.activeInHierarchy)
-                    return Instantiate<T>((T)window);
-                else
-                    return (T)window;
-        }
-
         T loadedWindow = Resources.Load<T>("Windows/" + typeof(T).Name);
 
-        if (loadedWindow != null && !_windows.Contains(loadedWindow))
-            _windows.Add(loadedWindow);
-
-
-        return Instantiate<T>(loadedWindow);
+        return Instantiate<T>(loadedWindow, _mainCanvas.transform);
     }
 }
