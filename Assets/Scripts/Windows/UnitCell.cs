@@ -19,7 +19,7 @@ public class UnitCell : MonoBehaviour
         _unit = unit;
 
         _unitNameText.text = Localization.Instance.Get("unit_name_" + _unit.id);
-        _unitIcon.sprite = Resources.Load<Sprite>($"{GameConfig.Instance.resourcesSpritesPath}UnitIcon_{_unit.id}");
+        _unitIcon.sprite = Resources.Load<Sprite>($"{GameConfig.Instance.troopsImagePath}TroopIcon_{_unit.id}");
     }
 
     public void OnValueChanged()

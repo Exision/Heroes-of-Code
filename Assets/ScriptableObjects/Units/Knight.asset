@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 98cf9cf02f88d47448a6a2eb4efbf855, type: 3}
-  m_Name: Berserk
+  m_Name: Knight
   m_EditorClassIdentifier: 
-  id: 2
-  health: 50
+  id: 1
+  health: 100
   attackPower: 50
   skills:
   - {fileID: 11400000, guid: 62a3eebef5345eb43a3b65b9da09d0fa, type: 2}

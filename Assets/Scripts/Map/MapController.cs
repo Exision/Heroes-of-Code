@@ -86,8 +86,13 @@ public class MapController : SingletonMonoBehaviour<MapController>
                 yield break;
             }
 
+            if (_player.Path == null)
+                break;
+
             yield return _coroutineHalfSecond;
         }
+
+        _mapInterfaceController.CleanPath();
 
         ChangeGameState(E_MapGameState.Waiting);
 

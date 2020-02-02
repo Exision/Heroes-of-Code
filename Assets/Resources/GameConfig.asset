@@ -16,7 +16,9 @@ MonoBehaviour:
   basePlayerGroupPosition: {x: -6, y: 0}
   baseEnemyGroupPosition: {x: 6, y: 0}
   groupPositionOffset: {x: 0, y: 2.5}
+  maxQueueElementsCount: 0
   unitSpeed: 20
   unitChanceToFindPath: 0.25
-  resourcesSpritesPath: Sprites/
   troopsPrefabsPath: TroopsPrefabs/
+  troopsImagePath: TroopsIcons/
+  skillImagePath: SkillIcons/

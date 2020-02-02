@@ -7,10 +7,22 @@ public abstract class Skill : ScriptableObject
     [SerializeField] protected int _id;
     [SerializeField] protected float _usePower;
     [SerializeField] protected int _skillPower;
+    [SerializeField] protected E_SkillUsageTarget _skillTarget;
 
     public int Id => _id;
+
     public float Modificator => _usePower;
+
     public int Power => _skillPower;
 
-    public abstract void Use(Troop[] targets, float usePower);
+    public E_SkillUsageTarget SkillTarget => _skillTarget;
+
+    public abstract void Use(List<Troop> targets, float usePower);
+
+    public enum E_SkillUsageTarget
+    {
+        All,
+        Enemy,
+        Player
+    }
 }

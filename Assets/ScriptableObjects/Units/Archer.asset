@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98cf9cf02f88d47448a6a2eb4efbf855, type: 3}
   m_Name: Archer
   m_EditorClassIdentifier: 
-  id: 1
-  unitName: archer
-  health: 50
+  id: 0
+  health: 35
   attackPower: 100
   skills: []

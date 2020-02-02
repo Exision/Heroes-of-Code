@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Troop : MonoBehaviour, ITroop
 {
+    public Action onTroopDied;
+
     public UnitStats UnitStats { get; set; }
     public int UnitsCount { get; set; }
     public int CurrentHealth { get; set; }
@@ -23,6 +26,13 @@ public class Troop : MonoBehaviour, ITroop
     public void Attack(float damage)
     {
         CurrentHealth -= Mathf.RoundToInt(damage);
+
+        if (CurrentHealth <= 0)
+        {
+            Debug.Log("Troop Attack");
+
+            onTroopDied?.Invoke();
+        }
 
         UpdateData();
     }
@@ -46,5 +56,13 @@ public class Troop : MonoBehaviour, ITroop
             return false;
 
         return UnitStats.id == (other as Troop).UnitStats.id;
+    }
+
+    public override int GetHashCode()
+    {
+        int hash = 17;
+        hash = hash * 23 + UnitStats.id.GetHashCode();
+
+        return hash;
     }
 }

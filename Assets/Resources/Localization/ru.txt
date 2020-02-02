@@ -1,0 +1,18 @@
+skill_name_0 ~  Взмах
+skill_name_1 ~  Лечение
+skill_name_2 ~  Ярость
+skill_name_3 ~	Мощный удар
+skill_desc_0 ~  Наносит {1} урона вражеской команде
+skill_desc_1 ~  Лечит выбранного юнита на {0}% от максимального здоровья
+skill_desc_2 ~  Наносит всем {1} урона
+skill_desc_3 ~  Наносит {1} + {0} * нанесенный в бою юнитом урон
+unit_name_0 ~  Лучник
+unit_name_1 ~  Воин
+unit_name_2 ~  Маг
+unit_name_3 ~  Вор
+unit_name_4 ~  Лекарь
+create_group_window_title ~  Собери свой отряд!
+ready ~  Готово
+unit_cell_count ~ Кол-во
+enter_unit_count ~ Введите кол-во
+button_ok ~ Хорошо

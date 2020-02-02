@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Troops
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 0
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 2f1ce69569c098f4ead3336e71c808a1, type: 3}
+    - {fileID: 2800000, guid: a1e00d7ce1287ec4da6b9113e23855f4, type: 3}
+    totalSpriteSurfaceArea: 9310
+    bindAsDefault: 1
+    storedHash:
+      serializedVersion: 2
+      Hash: a4bc7345e30b697abd708b9c886b15be
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 9b66e4403c10e374a80db24c441f1f43, type: 3}
+  - {fileID: 21300000, guid: e9e31d609dfd9c24d9d03c25044f54e1, type: 3}
+  - {fileID: 21300000, guid: f46f11911ecfd0c46bb6353a658e46ae, type: 3}
+  - {fileID: 21300000, guid: b4a279c2a8b52ff49bea35c641d74b3d, type: 3}
+  - {fileID: 21300000, guid: eec27b333e845da41b8b32225d13834d, type: 3}
+  - {fileID: 21300000, guid: 90127c5381688d042ad363e5ff9b82e7, type: 3}
+  - {fileID: 21300000, guid: c8f3dde365890d24a853a6c6bde5b956, type: 3}
+  - {fileID: 21300000, guid: 0a443324ddc004f4e929bb2e897a62bc, type: 3}
+  - {fileID: 21300000, guid: 81d0b624e2b627941a6144503494d300, type: 3}
+  - {fileID: 21300000, guid: 30943a658546b344e9f910f1ce8ee11a, type: 3}
+  - {fileID: 21300000, guid: 281f1be52fcffe748b120babde05b62b, type: 3}
+  - {fileID: 21300000, guid: c01b0d063666eba41890214f7ecc85b0, type: 3}
+  - {fileID: 21300000, guid: 5e10184629cf10d46b1148c1a4001983, type: 3}
+  - {fileID: 21300000, guid: bb8dfa77bb9af6e49bb17c04d0123a84, type: 3}
+  - {fileID: 21300000, guid: 9567bdd7b76a5cc4a8eb2c4c9fc88df2, type: 3}
+  - {fileID: 21300000, guid: 500047388cd88d34ebb71808be76ff23, type: 3}
+  - {fileID: 21300000, guid: 30642baa2d521d245a8195f68ff0d6e3, type: 3}
+  - {fileID: 21300000, guid: cce3174cdb5a7e3458c43105482e3c86, type: 3}
+  - {fileID: 21300000, guid: a1e00d7ce1287ec4da6b9113e23855f4, type: 3}
+  - {fileID: 21300000, guid: 717321fc936244d49b343d99ac42b434, type: 3}
+  - {fileID: 21300000, guid: f3d85dbdc3a3c904ca592790251bf175, type: 3}
+  - {fileID: 21300000, guid: bf7d8daebdba2314d8e591de013e612a, type: 3}
+  - {fileID: 21300000, guid: 3e0b04de6060fe54c9ec8911b6eed024, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Archer_Idle_2
+  - NormalNun_Idle + Walk_4
+  - Thief_Idle_3
+  - HeavyKnight_Idle_4
+  - Thief_Idle_1
+  - HeavyKnight_Idle_1
+  - Archer_Idle_3
+  - HeavyKnight_Idle_3
+  - Mage_Idle_2
+  - Mage_Idle_3
+  - NormalNun_Idle + Walk_2
+  - NormalNun_Idle + Walk_3
+  - HeavyKnight_Idle_2
+  - Archer_Idle_1
+  - Executioner_Idle_1
+  - Mage_Idle_4
+  - Thief_Idle_4
+  - Archer_Idle_4
+  - Highlight
+  - Mage_Idle_1
+  - Thief_Idle_2
+  - NormalNun_Idle + Walk_1
+  - King
+  m_Tag: Troops
+  m_IsVariant: 0
