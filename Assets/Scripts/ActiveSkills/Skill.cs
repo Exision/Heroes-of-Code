@@ -10,14 +10,11 @@ public abstract class Skill : ScriptableObject
     [SerializeField] protected E_SkillUsageTarget _skillTarget;
 
     public int Id => _id;
-
     public float Modificator => _usePower;
-
     public int Power => _skillPower;
-
     public E_SkillUsageTarget SkillTarget => _skillTarget;
 
-    public abstract void Use(List<Troop> targets, float usePower);
+    public abstract void Use(List<BattleQueueElement> targets, float usePower);
 
     public enum E_SkillUsageTarget
     {

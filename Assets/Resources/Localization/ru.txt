@@ -12,7 +12,12 @@ unit_name_2 ~  Маг
 unit_name_3 ~  Вор
 unit_name_4 ~  Лекарь
 create_group_window_title ~  Собери свой отряд!
+create_group_map_button ~ Пересоздать отряд
 ready ~  Готово
 unit_cell_count ~ Кол-во
 enter_unit_count ~ Введите кол-во
 button_ok ~ Хорошо
+error_empty_group ~ Пустая команда
+win ~  Победа!
+lose ~ Поражение!
+end_game ~ Игра закончена!\nПерезапуск

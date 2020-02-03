@@ -8,14 +8,19 @@ public class MapChipManager : MonoBehaviour
 
     private Dictionary<int, EnemyMapChip> _enemysDatas = new Dictionary<int, EnemyMapChip>();
 
-    public void Init(Dictionary<int,Vector3> enemysPosition)
+    public void Init()
     {
-        foreach(KeyValuePair<int, Vector3> enemy in enemysPosition)
-        {
-            EnemyMapChip enemyChip = Instantiate<EnemyMapChip>(_enemyChipPrefab, _enemyChipPrefab.transform.parent);
-            enemyChip.transform.position = enemy.Value;
+        _enemysDatas.Clear();
 
-            _enemysDatas.Add(enemy.Key, enemyChip);
+        foreach(EnemyData enemy in GameController.Instance.EnemysDatas)
+        {
+            if (GameController.Instance.DefeatedEnemys.Contains(enemy))
+                continue;
+
+            EnemyMapChip enemyChip = Instantiate<EnemyMapChip>(_enemyChipPrefab, _enemyChipPrefab.transform.parent);
+            enemyChip.transform.position = (Vector3)enemy.Position;
+
+            _enemysDatas.Add(enemy.Id, enemyChip);
         }
 
         Destroy(_enemyChipPrefab.gameObject);

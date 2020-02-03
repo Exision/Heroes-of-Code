@@ -10,11 +10,8 @@ public class BattleQueueElement
     public Action<BattleQueueElement> onTroopDied;
 
     public Troop Troop { get; private set; }
-
     public TroopObject TroopObject { get; private set; }
-
     public E_ElementTeam Team { get; private set; }
-
     public List<Skill> UsedSkills { get; private set; } = new List<Skill>();
 
     public BattleQueueElement(Troop troop, TroopObject troopObject, E_ElementTeam team)
@@ -27,7 +24,7 @@ public class BattleQueueElement
         Troop.onTroopDied = OnTroopDied;
     }
 
-    public void UseSkill(Skill skill, List<Troop> targets, float power)
+    public void UseSkill(Skill skill, List<BattleQueueElement> targets, float power)
     {
         bool isExist = false;
 
@@ -40,6 +37,7 @@ public class BattleQueueElement
                 break;
             }
         }
+
         if (!isExist || UsedSkills.Contains(skill))
             return;
 
@@ -57,8 +55,6 @@ public class BattleQueueElement
 
     private void OnTroopDied()
     {
-        Debug.Log("BattleQueueElement OnTroopDied");
-
         onTroopDied?.Invoke(this);
     }
 

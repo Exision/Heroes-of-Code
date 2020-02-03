@@ -9,7 +9,7 @@ public class CreateGroupWindow : Window
 
     [SerializeField] private UnitCell _unitCellPrefab;
 
-    private List<UnitCell> _unitCells;
+    private List<UnitCell> _unitCells = new List<UnitCell>();
     private Dictionary<int, int> _group = new Dictionary<int, int>();
 
     public override void Show(bool animation = true)
@@ -26,6 +26,8 @@ public class CreateGroupWindow : Window
             UnitCell unitCell = Instantiate<UnitCell>(_unitCellPrefab, _unitCellPrefab.transform.parent);
             unitCell.Init(unit);
             unitCell.onValueChanged = OnUnitCountChanged;
+
+            _unitCells.Add(unitCell);
         }
 
         Destroy(_unitCellPrefab.gameObject);

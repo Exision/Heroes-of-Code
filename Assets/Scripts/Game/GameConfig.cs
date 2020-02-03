@@ -3,16 +3,20 @@
 [CreateAssetMenu(fileName = "GameConfig", menuName = "ScriptableObject/GameConfig", order = 1)]
 public class GameConfig : SingletonScriptableObject<GameConfig>
 {
+    public const string MAIN_SCENE_PATH = "Scenes/MainScene";
     public const string MAP_SCENE_PATH = "Scenes/MapScene";
     public const string BATTLE_SCENE_PATH = "Scenes/BattleScene";
 
     [Header("Map Settings")]
     public int enemysCount;
+    public Vector3 playerStartPosition;
 
     [Header("Battle Settings")]
     public Vector2 basePlayerGroupPosition;
     public Vector2 baseEnemyGroupPosition;
     public Vector2 groupPositionOffset;
+    public Vector3 enemyTroopScale;
+    public float enemyUseSkillChance;
 
     [Header("Battle UI Settings")]
     public int maxQueueElementsCount;

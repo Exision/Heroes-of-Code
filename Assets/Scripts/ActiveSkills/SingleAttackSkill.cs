@@ -5,9 +5,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SingleAttack", menuName = "ScriptableObject/ActiveSkills/SingleAttack", order = 1)]
 public class SingleAttackSkill : Skill
 {
-    public override void Use(List<Troop> targets, float usePower)
+    public override void Use(List<BattleQueueElement> targets, float usePower)
     {
         if (targets.Count > 0)
-            targets[0].Attack(usePower * Modificator + Power);
+            targets[0].Troop.Attack(usePower * Modificator + Power);
     }
 }

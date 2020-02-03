@@ -39,4 +39,16 @@ public class MapInterfaceController : MonoBehaviour
         for (int loop = 0; loop < _currentPath.Count; loop++)
             _interfaceTilemap.SetTile(_currentPath[loop].TilemapPosition, null);
     }
+
+    public void OnClickCreateGroup()
+    {
+        CreateGroupWindow createGroupWindow = WindowManager.Instance.GetWindow<CreateGroupWindow>();
+        createGroupWindow.onGroupReady = (Dictionary<int, int> newGroup) =>
+        {
+            createGroupWindow.Hide();
+
+            GameController.Instance.PlayerData.SetGroup(newGroup);
+        };
+        createGroupWindow.Show();
+    }
 }

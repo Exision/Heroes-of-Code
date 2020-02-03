@@ -1,8 +1,8 @@
 ﻿public class Heap<T> where T: IHeapItem<T>
 {
-    private T[] _items;
-
     public int Count { get; private set; }
+
+    private T[] _items;
 
     public Heap(int maxHeapSize)
     {
@@ -12,6 +12,7 @@
     public void Add(T item)
     {
         item.HeapIndex = Count;
+
         _items[Count] = item;
 
         SortUp(item);
@@ -22,6 +23,7 @@
     public T RemoveFirst()
     {
         T firstItem = _items[0];
+
         Count--;
 
         _items[0] = _items[Count];

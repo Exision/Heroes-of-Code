@@ -5,44 +5,37 @@ using UnityEngine.UI;
 
 public class BattleInterfaceController : MonoBehaviour
 {
-    [SerializeField] private Text _battleLog;
     [SerializeField] private BattleQueueView _battleQueueViewPrefab;
     [SerializeField] private BattleSkillView _battleSkillViewPrefab;
 
     private BattleController _battleController;
 
     private List<BattleQueueView> _battleQueueViews = new List<BattleQueueView>();
-
     private List<BattleSkillView> _battleSkillViews = new List<BattleSkillView>();
 
     private int _currentTroop = -1;
-
     private int _selectedSkill = -1;
 
     private void SubscribeToEvents()
     {
-        _battleController.onActionPerformed += OnActionPerformed;
         _battleController.onCurrentElementChanged += OnElementChanged;
     }
 
     private void OnDisable()
     {
-        _battleController.onActionPerformed -= OnActionPerformed;
         _battleController.onCurrentElementChanged -= OnElementChanged;
     }
 
     private void Start()
     {
-        _battleLog.text = "";
-
         _battleSkillViewPrefab.gameObject.SetActive(false);
     }
 
     public void Init(BattleController controller)
     {
         _battleController = controller;
-        SubscribeToEvents();
 
+        SubscribeToEvents();
         CreateBattleQueueView();
     }
 
@@ -61,9 +54,15 @@ public class BattleInterfaceController : MonoBehaviour
 
     private void UpdateQueueViews()
     {
-        for (int loop = 0; loop < _battleController.BattleQueue.Count; loop++)
+        for (int loop = 0; loop < _battleQueueViews.Count; loop++)
         {
-            _battleQueueViews[loop].Init(_battleController.BattleQueue[loop]);
+            if (loop >= _battleController.BattleQueue.Count)
+                _battleQueueViews[loop].gameObject.SetActive(false);
+            else
+            {
+                _battleQueueViews[loop].gameObject.SetActive(true);
+                _battleQueueViews[loop].Init(_battleController.BattleQueue[loop]);
+            }
         }
     }
 
@@ -131,10 +130,5 @@ public class BattleInterfaceController : MonoBehaviour
     public void OnAttackButtonClick()
     {
         _battleController.PerformTurn();
-    }
-
-    private void OnActionPerformed(string log)
-    {
-        _battleLog.text = _battleLog.text + "\n" + log;
     }
 }

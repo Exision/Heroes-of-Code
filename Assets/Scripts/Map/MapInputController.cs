@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class InputController : MonoBehaviour
+public class MapInputController : MonoBehaviour
 {
     public static Action<Vector3> onPositionSelected;
 
@@ -10,7 +10,7 @@ public class InputController : MonoBehaviour
 
     void Start()
     {
-       _eventSystem = FindObjectOfType<EventSystem>();
+        _eventSystem = FindObjectOfType<EventSystem>();
     }
     private void Update()
     {

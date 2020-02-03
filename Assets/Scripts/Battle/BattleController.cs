@@ -5,23 +5,22 @@ using UnityEngine;
 
 public class BattleController : MonoBehaviour
 {
-    [SerializeField] private BattleInterfaceController _battleInterface;
-    [SerializeField] private Camera currCamera;
-
     public Action<int> onCurrentElementChanged;
-    public Action<string> onActionPerformed;
 
-    private List<BattleQueueElement> _playerGroup = new List<BattleQueueElement>();
-
-    private List<BattleQueueElement> _enemyGroup = new List<BattleQueueElement>();
+    [SerializeField] private BattleInterfaceController _battleInterface;
 
     public List<BattleQueueElement> BattleQueue { get; private set; } = new List<BattleQueueElement>();
 
     private E_BattleState _battleState = E_BattleState.Waiting;
 
+    private List<BattleQueueElement> _playerGroup = new List<BattleQueueElement>();
+    private List<BattleQueueElement> _enemyGroup = new List<BattleQueueElement>();
+
     private int _currentQueueElement = 0;
     private int _selectedSkill = -1;
-    private List<BattleQueueElement> _selectedTroops = new List<BattleQueueElement>();
+    private BattleQueueElement _selectedTroops;
+
+    private WaitForSeconds _animationWait = new WaitForSeconds(0.3f);
 
     private void Start()
     {
@@ -36,9 +35,7 @@ public class BattleController : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                RaycastHit2D[] hits = Physics2D.RaycastAll(currCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity);
-
-                Debug.Log(hits.Length);
+                RaycastHit2D[] hits = Physics2D.RaycastAll(Camera.allCameras[1].ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity);
 
                 for (int loop = 0; loop < hits.Length; loop++)
                 {
@@ -55,7 +52,6 @@ public class BattleController : MonoBehaviour
     {
         InitPlayer();
         InitEnemys();
-
         CreateQueue();
 
         _battleInterface.Init(this);
@@ -63,7 +59,7 @@ public class BattleController : MonoBehaviour
 
     private void InitEnemys()
     {
-        List<Troop> enemyTroops = GameController.Instance.EnemysDatas[GameController.Instance.CurrentEnemy];
+        List<Troop> enemyTroops = GameController.Instance.EnemysDatas[GameController.Instance.CurrentEnemy].Group;
 
         TroopObject[] enemyObjects = new EnemyFactory().Create(enemyTroops);
 
@@ -101,14 +97,10 @@ public class BattleController : MonoBehaviour
 
             BattleQueue.Add(loop < _enemyGroup.Count ? _enemyGroup[loop] : _enemyGroup[loop % _enemyGroup.Count]);
         }
-
-        Debug.Log($"Plyer group: {_playerGroup.Count}, Enem: {_enemyGroup.Count} Queue lenght :{BattleQueue.Count}");
     }
 
     private void SelectNextElement()
     {
-        //_currentQueueElement++;
-
         if (_currentQueueElement >= BattleQueue.Count)
             _currentQueueElement = 0;
 
@@ -146,6 +138,34 @@ public class BattleController : MonoBehaviour
 
     private void EnemyTurn()
     {
+        StartCoroutine(EnemyTurnCoroutine());
+
+        /*
+        BattleQueueElement currentTroop = BattleQueue[_currentQueueElement];
+
+        bool isHaveSkills = currentTroop.Troop.UnitStats.skills.Length > 0 && currentTroop.UsedSkills.Count != currentTroop.Troop.UnitStats.skills.Length;
+
+        if (isHaveSkills && UnityEngine.Random.value < GameConfig.Instance.enemyUseSkillChance)
+        {
+            Skill skill = currentTroop.Troop.UnitStats.skills[UnityEngine.Random.Range(0, currentTroop.Troop.UnitStats.skills.Length)];
+
+            List<BattleQueueElement> skillTargets = new List<BattleQueueElement>();
+
+            switch (skill.SkillTarget)
+            {
+                case Skill.E_SkillUsageTarget.All:
+                    skillTargets.AddRange(_playerGroup);
+                    skillTargets.AddRange(_enemyGroup);
+
+                    currentTroop.UseSkill(skill, skillTargets, currentTroop.Troop.CurrentDamage));
+
+                    break;
+                    /*
+                case Skill.E_SkillUsageTarget.Enemy:
+                case Skill.E_SkillUsageTarget.Player:
+            }
+        }
+
         BattleQueueElement playerElement = _playerGroup[UnityEngine.Random.Range(0, _playerGroup.Count)];
 
         playerElement.Troop.Attack(BattleQueue[_currentQueueElement].Troop.CurrentDamage);
@@ -155,69 +175,138 @@ public class BattleController : MonoBehaviour
         EndTurn();
 
         SelectNextElement();
+        */
     }
 
-    private void OnTroopDied(BattleQueueElement troop)
+    private IEnumerator EnemyTurnCoroutine()
     {
-        Debug.Log($"Troop died: {troop.Troop.UnitStats.id}");
+        BattleQueueElement playerElement = _playerGroup[UnityEngine.Random.Range(0, _playerGroup.Count)];
 
-        BattleQueue.Remove(troop);
+        yield return AttackAnimation(BattleQueue[_currentQueueElement], playerElement);
 
-        if (troop.Team == BattleQueueElement.E_ElementTeam.Player)
-            _playerGroup.Remove(troop);
-        else
-            _enemyGroup.Remove(troop);
+        EndTurn();
 
-        Destroy(troop.TroopObject.gameObject);
+        SelectNextElement();
 
-        if (_playerGroup.Count == 0)
-        {
-            WindowManager.Instance.GetWindow<MessageWindow>().Show("Lose");
-        }
-        else if (_enemyGroup.Count == 0)
-            WindowManager.Instance.GetWindow<MessageWindow>().Show("Win");
-
-        ChangeState(E_BattleState.Waiting);  
+        yield break;
     }
 
     public void PerformTurn()
     {
-        if (_selectedSkill >= 0)
+        StartCoroutine(PerformTurnCoroutine());
+    }
+    
+    private IEnumerator PerformTurnCoroutine()
+    {
+        if (_selectedTroops != null)
         {
-            List<Troop> skillTargets = new List<Troop>();
+            if (_selectedSkill >= 0)
+            {
 
-            for (int loop = 0; loop < _selectedTroops.Count; loop++)
-                skillTargets.Add(_selectedTroops[loop].Troop);
-
-            BattleQueue[_currentQueueElement].UseSkill(BattleQueue[_currentQueueElement].Troop.UnitStats.skills[_selectedSkill], skillTargets, 10);
-        }
-        else
-        {
-            _selectedTroops[0].Troop.Attack(BattleQueue[_currentQueueElement].Troop.CurrentDamage);
-
-            onActionPerformed?.Invoke($"Team {BattleQueue[_currentQueueElement].Team} attack {_selectedTroops[0].Troop.UnitStats.id} with {BattleQueue[_currentQueueElement].Troop.CurrentDamage} damage. HP left: {_selectedTroops[0].Troop.CurrentHealth}");
+            }
+            else
+                yield return AttackAnimation(BattleQueue[_currentQueueElement], _selectedTroops);
         }
 
         EndTurn();
 
-        SelectNextElement();   
+        SelectNextElement();
+
+        yield break;
+    }
+
+    private IEnumerator AttackAnimation(BattleQueueElement performer, BattleQueueElement target)
+    {
+        Vector3 performerStartPosition = performer.TroopObject.transform.position;
+
+        performer.TroopObject.transform.position =
+            Vector3.MoveTowards(performer.TroopObject.transform.position,
+            target.TroopObject.transform.position + (target.Team == BattleQueueElement.E_ElementTeam.Enemy ? Vector3.left : Vector3.right),
+            GameConfig.Instance.unitSpeed);
+
+        yield return _animationWait;
+
+        target.Troop.Attack(performer.Troop.CurrentDamage);
+
+        performer.TroopObject.transform.position = Vector3.MoveTowards(performer.TroopObject.transform.position, performerStartPosition, GameConfig.Instance.unitSpeed);
+
+        yield return _animationWait;
+
+        yield break;
     }
 
     private void EndTurn()
     {
         BattleQueueElement queueElement = BattleQueue[_currentQueueElement];
 
+        if (_playerGroup.Count == 0 || _enemyGroup.Count == 0)
+            EndBattle();
+
         BattleQueue.Remove(queueElement);
         BattleQueue.Add(queueElement);
 
-        _selectedTroops.Clear();
+        _selectedTroops = null;
         _selectedSkill = -1;
+
+        for (int loop = 0; loop < BattleQueue.Count - 1; loop++)
+        {
+            if (loop >= BattleQueue.Count)
+                break;
+
+            if (BattleQueue[loop] == BattleQueue[loop + 1])
+                BattleQueue.RemoveAt(loop + 1);
+        }
+    }
+
+    private void OnTroopDied(BattleQueueElement troop)
+    {
+        BattleQueue.RemoveAll(item => item == troop);
+
+        Destroy(troop.TroopObject.gameObject);
+
+        if (troop.Team == BattleQueueElement.E_ElementTeam.Player)
+            _playerGroup.Remove(troop);
+        else
+            _enemyGroup.Remove(troop);
+    }
+
+    private void EndBattle()
+    {
+        ChangeState(E_BattleState.Waiting);
+
+        bool isWin = _enemyGroup.Count == 0;
+
+        if (isWin)
+        {
+            MessageWindow messageWindow = WindowManager.Instance.GetWindow<MessageWindow>();
+            messageWindow.onClickOkButton = () =>
+            {
+                messageWindow.Hide();
+
+                List<Troop> group = new List<Troop>();
+
+                for (int loop = 0; loop < _playerGroup.Count; loop++)
+                    group.Add(_playerGroup[loop].Troop);
+
+                GameController.Instance.EndBattle(group);
+            };
+            messageWindow.Show(Localization.Instance.Get("win"));
+        }
+        else
+        {
+            MessageWindow messageWindow = WindowManager.Instance.GetWindow<MessageWindow>();
+            messageWindow.onClickOkButton = () =>
+            {
+                messageWindow.Hide();
+
+                GameController.Instance.EndGame();
+            };
+            messageWindow.Show(Localization.Instance.Get("lose"));
+        }
     }
 
     public void SetAttackView()
     {
-        Debug.Log("SetAttack");
-
         for (int loop = 0; loop < Mathf.Max(_playerGroup.Count, _enemyGroup.Count); loop++)
         {
             if (loop < _enemyGroup.Count)
@@ -306,7 +395,7 @@ public class BattleController : MonoBehaviour
 
         if (_selectedSkill == -1)
         {
-            _selectedTroops.Add(selectedTroop);
+            _selectedTroops = selectedTroop;
 
             SetAttackTroop(selectedTroop);
         }

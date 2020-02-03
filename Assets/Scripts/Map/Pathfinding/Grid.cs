@@ -5,8 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class Grid : MonoBehaviour
 {
-    [SerializeField] public Tilemap _tilemap;
-    private BoundsInt _tilemapBounds;
+    [SerializeField] private Tilemap _tilemap;
 
     public int MaxSize
     {
@@ -15,8 +14,9 @@ public class Grid : MonoBehaviour
             return MapGrid.GetLength(0) * MapGrid.GetLength(1);
         }
     }
-
     public Node[,] MapGrid { get; private set; }
+
+    private BoundsInt _tilemapBounds;
 
     private void Awake()
     {

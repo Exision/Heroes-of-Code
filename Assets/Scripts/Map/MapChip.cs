@@ -8,7 +8,6 @@ public class MapChip : MonoBehaviour
 
     protected int _nextNodeIndex;
 
-
     public virtual void Move()
     {
         MoveNextTile();

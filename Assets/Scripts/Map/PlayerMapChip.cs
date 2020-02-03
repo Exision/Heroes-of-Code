@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerMapChip : MapChip
 {
-    public Action<Vector3Int> onMoveDone;
+    public Action<Vector3Int, Vector3> onMoveDone;
 
     public void SetPath(List<Node> path)
     {
@@ -14,9 +14,9 @@ public class PlayerMapChip : MapChip
 
     public override void Move()
     {
-        base.Move();
-
         if (Path != null)
-            onMoveDone?.Invoke(Path[_nextNodeIndex - 1].TilemapPosition);
+            onMoveDone?.Invoke(Path[_nextNodeIndex].TilemapPosition, Path[_nextNodeIndex].WorldPosition);
+
+        base.Move();
     }
 }

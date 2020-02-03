@@ -16,13 +16,15 @@ public class MapController : SingletonMonoBehaviour<MapController>
 
     private void OnEnable()
     {
-        InputController.onPositionSelected += OnPositionSelected;
+        MapInputController.onPositionSelected += OnPositionSelected;
+
         _player.onMoveDone += OnPlayerMoveDone;
     }
 
     private void OnDisable()
     {
-        InputController.onPositionSelected -= OnPositionSelected;
+        MapInputController.onPositionSelected -= OnPositionSelected;
+
         _player.onMoveDone -= OnPlayerMoveDone;
     }
 
@@ -30,28 +32,44 @@ public class MapController : SingletonMonoBehaviour<MapController>
     {
         GenerateEnemysMapChips();
 
+        _player.transform.position = GameController.Instance.PlayerData.Position;
+
         ChangeGameState(E_MapGameState.Waiting);
     }
 
     private void GenerateEnemysMapChips()
     {
-        Dictionary<int, Vector3> enemysPositions = new Dictionary<int, Vector3>();
-        int gridX = default;
-        int gridY = default;
+        bool isPositionGenerated = true;
 
-        foreach (KeyValuePair<int, List<Troop>> enemy in GameController.Instance.EnemysDatas)
+        for (int loop = 0; loop < GameController.Instance.EnemysDatas.Count; loop++)
+            isPositionGenerated = isPositionGenerated && (GameController.Instance.EnemysDatas[loop].Position != null);
+
+        if (isPositionGenerated)
         {
+            _mapChipController.Init();
+
+            return;
+        }
+
+        List<Vector3> occupiedPositions = new List<Vector3>();
+
+        foreach (EnemyData enemy in GameController.Instance.EnemysDatas)
+        {
+            int gridX = default;
+            int gridY = default;
+
             do
             {
                 gridX = UnityEngine.Random.Range(5, _grid.MapGrid.GetLength(0));
                 gridY = UnityEngine.Random.Range(5, _grid.MapGrid.GetLength(1));
             }
-            while (!_grid.MapGrid[gridX, gridY].Walkable && !enemysPositions.ContainsValue(_grid.MapGrid[gridX, gridY].WorldPosition));
+            while (!_grid.MapGrid[gridX, gridY].Walkable && !occupiedPositions.Contains(_grid.MapGrid[gridX, gridY].WorldPosition));
 
-            enemysPositions.Add(enemy.Key, _grid.MapGrid[gridX, gridY].WorldPosition);
+            enemy.Position = _grid.MapGrid[gridX, gridY].WorldPosition;
+            occupiedPositions.Add(_grid.MapGrid[gridX, gridY].WorldPosition);
         }
 
-        _mapChipController.Init(enemysPositions);
+        _mapChipController.Init();
     }
 
     private void ChangeGameState(E_MapGameState newGameState)
@@ -92,8 +110,6 @@ public class MapController : SingletonMonoBehaviour<MapController>
             yield return _coroutineHalfSecond;
         }
 
-        _mapInterfaceController.CleanPath();
-
         ChangeGameState(E_MapGameState.Waiting);
 
         yield break;
@@ -126,8 +142,10 @@ public class MapController : SingletonMonoBehaviour<MapController>
         }
     }
 
-    private void OnPlayerMoveDone(Vector3Int tilePosition)
+    private void OnPlayerMoveDone(Vector3Int tilePosition, Vector3 worldPosition)
     {
         _mapInterfaceController.CleanTile(tilePosition);
+
+        GameController.Instance.PlayerData.Position = worldPosition;
     }
 }

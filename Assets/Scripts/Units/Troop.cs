@@ -3,15 +3,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Troop : MonoBehaviour, ITroop
+public class Troop : ITroop
 {
     public Action onTroopDied;
 
     public UnitStats UnitStats { get; set; }
-    public int UnitsCount { get; set; }
-    public int CurrentHealth { get; set; }
-    public int CurrentDamage { get; set; }
+    public int UnitsCount
+    {
+        get => _unitCount;
+        set
+        {
+            _unitCount = value >= 0 ? value : 0;
+        }
+    }
+    public int CurrentHealth
+    {
+        get => _currentHealth;
+        set
+        {
+            _currentHealth = value >= 0 ? value : 0;
+        }
+    }
+    public int CurrentDamage
+    {
+        get => _currentDamage;
+        set
+        {
+            _currentDamage = value >= 0 ? value : 0;
+        }
+    }
 
+    private int _unitCount;
+    private int _currentHealth;
+    private int _currentDamage;
 
     public Troop(UnitStats unitStats, int troopsCount)
     {
@@ -28,11 +52,7 @@ public class Troop : MonoBehaviour, ITroop
         CurrentHealth -= Mathf.RoundToInt(damage);
 
         if (CurrentHealth <= 0)
-        {
-            Debug.Log("Troop Attack");
-
             onTroopDied?.Invoke();
-        }
 
         UpdateData();
     }
