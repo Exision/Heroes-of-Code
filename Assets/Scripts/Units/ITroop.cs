@@ -6,6 +6,6 @@
     int CurrentHealth { get; set; }
     int CurrentDamage { get; set; }
 
-    void Attack(float damage);
+    void DealDamage(float damage);
     void Heal(float healAmount);
 }

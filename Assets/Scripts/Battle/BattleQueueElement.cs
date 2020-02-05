@@ -5,26 +5,32 @@ using UnityEngine;
 
 public class BattleQueueElement
 {
-    public Action onSkillUsed;
+    public Action<BattleQueueElement, int> onPerformAttack;
+    public Action<Skill> onSkillUsed;
     public Action<BattleQueueElement> onClickTroop;
+    public Action<BattleQueueElement, int> onDamageReceived;
+    public Action<BattleQueueElement, int> onHealReceived;
     public Action<BattleQueueElement> onTroopDied;
 
     public Troop Troop { get; private set; }
     public TroopObject TroopObject { get; private set; }
-    public E_ElementTeam Team { get; private set; }
+    public E_BatteElementTeam Team { get; private set; }
     public List<Skill> UsedSkills { get; private set; } = new List<Skill>();
+    public int DamageDuringBattle { get; private set; }
 
-    public BattleQueueElement(Troop troop, TroopObject troopObject, E_ElementTeam team)
+    public BattleQueueElement(Troop troop, TroopObject troopObject, E_BatteElementTeam team)
     {
         Troop = troop;
         TroopObject = troopObject;
         Team = team;
 
         TroopObject.onClickTroop = OnClickTroop;
+        Troop.onDamageReceived = OnDamageReceived;
+        Troop.onHealReceived = OnHealReceived;
         Troop.onTroopDied = OnTroopDied;
     }
 
-    public void UseSkill(Skill skill, List<BattleQueueElement> targets, float power)
+    public void UseSkill(Skill skill, List<BattleQueueElement> targets)
     {
         bool isExist = false;
 
@@ -43,9 +49,28 @@ public class BattleQueueElement
 
         UsedSkills.Add(skill);
 
-        skill.Use(targets, power);
+        skill.Use(this, targets);
 
-        onSkillUsed?.Invoke();
+        onSkillUsed?.Invoke(skill);
+    }
+
+    public void Attack(BattleQueueElement target)
+    {
+        int damage = 0; 
+        int hpLeft = target.Troop.CurrentHealth - Troop.CurrentDamage;
+
+        damage = hpLeft < 0 ? Troop.CurrentDamage + hpLeft : Troop.CurrentDamage;
+
+        DamageDuringBattle += damage;
+
+        target.Troop.DealDamage(damage);
+
+        onPerformAttack?.Invoke(target, damage);
+    }
+
+    public void Move(Vector3 position)
+    {
+        TroopObject.transform.position = Vector3.MoveTowards(TroopObject.transform.position, position, GameConfig.Instance.unitSpeed);
     }
 
     private void OnClickTroop()
@@ -58,6 +83,16 @@ public class BattleQueueElement
         onTroopDied?.Invoke(this);
     }
 
+    private void OnDamageReceived(int damage)
+    {
+        onDamageReceived?.Invoke(this, damage);
+    }
+
+    private void OnHealReceived(int healAmount)
+    {
+        onHealReceived?.Invoke(this, healAmount);
+    }
+
     public override bool Equals(object other)
     {
         if (other == null || !this.GetType().Equals(other.GetType()))
@@ -66,12 +101,6 @@ public class BattleQueueElement
         BattleQueueElement otherElement = other as BattleQueueElement;
 
         return Troop.UnitStats.id == otherElement.Troop.UnitStats.id && Team == otherElement.Team;
-    }
-
-    public enum E_ElementTeam
-    {
-        Player,
-        Enemy
     }
 
     public override int GetHashCode()

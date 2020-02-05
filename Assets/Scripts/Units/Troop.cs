@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Troop : ITroop
 {
+    public Action<int> onDamageReceived;
+    public Action<int> onHealReceived;
     public Action onTroopDied;
 
     public UnitStats UnitStats { get; set; }
@@ -47,9 +49,11 @@ public class Troop : ITroop
     }
 
 
-    public void Attack(float damage)
+    public void DealDamage(float damage)
     {
         CurrentHealth -= Mathf.RoundToInt(damage);
+
+        onDamageReceived?.Invoke(Mathf.RoundToInt(damage));
 
         if (CurrentHealth <= 0)
             onTroopDied?.Invoke();
@@ -59,7 +63,9 @@ public class Troop : ITroop
 
     public void Heal(float healAmount)
     {
-        CurrentHealth += Mathf.RoundToInt(UnitStats.health * healAmount);
+        CurrentHealth += Mathf.RoundToInt(healAmount);
+
+        onHealReceived?.Invoke(Mathf.RoundToInt(healAmount));
 
         UpdateData();
     }

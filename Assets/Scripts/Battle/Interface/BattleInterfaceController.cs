@@ -1,29 +1,36 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class BattleInterfaceController : MonoBehaviour
 {
+    public Action onClickPerformTurnButton;
+    public Action<int> onSkillSelect;
+
     [SerializeField] private BattleQueueView _battleQueueViewPrefab;
     [SerializeField] private BattleSkillView _battleSkillViewPrefab;
+    [SerializeField] private Text _battleLog;
+    [SerializeField] private TextFly _damageTextFly;
 
     private BattleController _battleController;
 
     private List<BattleQueueView> _battleQueueViews = new List<BattleQueueView>();
     private List<BattleSkillView> _battleSkillViews = new List<BattleSkillView>();
 
-    private int _currentTroop = -1;
     private int _selectedSkill = -1;
 
     private void SubscribeToEvents()
     {
+        _battleController.onActionPerformed += OnActionPerformed;
         _battleController.onCurrentElementChanged += OnElementChanged;
     }
 
     private void OnDisable()
     {
         _battleController.onCurrentElementChanged -= OnElementChanged;
+        _battleController.onActionPerformed -= OnActionPerformed;
     }
 
     private void Start()
@@ -52,6 +59,7 @@ public class BattleInterfaceController : MonoBehaviour
         Destroy(_battleQueueViewPrefab.gameObject);
     }
 
+    #region Skills view update
     private void UpdateQueueViews()
     {
         for (int loop = 0; loop < _battleQueueViews.Count; loop++)
@@ -66,33 +74,34 @@ public class BattleInterfaceController : MonoBehaviour
         }
     }
 
-    private void OnElementChanged(int currentElement)
+    private void OnElementChanged()
     {
-        if (_currentTroop > -1)
-            _battleQueueViews[_currentTroop].SetSelected(false);
+        _battleQueueViews[0].SetSelected(false);
 
         if (_selectedSkill > -1)
             _battleSkillViews[_selectedSkill].SetSelected(false);
 
         _selectedSkill = -1;
-        _currentTroop = currentElement;
 
         UpdateQueueViews();
 
-        _battleQueueViews[_currentTroop].SetSelected(true);
+        _battleQueueViews[0].SetSelected(true);
 
-        SetSkillView(_battleController.BattleQueue[_currentTroop].Troop);
+        SetSkillView(_battleController.BattleQueue[0]);
     }
 
-    public void SetSkillView(Troop currentTroop)
+    public void SetSkillView(BattleQueueElement currentTroop)
     {
         for (int loop = 0; loop < _battleSkillViews.Count; loop++)
             _battleSkillViews[loop].gameObject.SetActive(false);
 
-        if (currentTroop.UnitStats.skills.Length > 0)
+        if (currentTroop.Troop.UnitStats.skills.Length > 0 && currentTroop.UsedSkills.Count != currentTroop.Troop.UnitStats.skills.Length)
         {
-            for (int loop = 0; loop < currentTroop.UnitStats.skills.Length; loop++)
+            for (int loop = 0; loop < currentTroop.Troop.UnitStats.skills.Length; loop++)
             {
+                if (currentTroop.UsedSkills.Contains(currentTroop.Troop.UnitStats.skills[loop]))
+                    continue;
+
                 if (loop >= _battleSkillViews.Count)
                 {
                     BattleSkillView skillView = Instantiate<BattleSkillView>(_battleSkillViewPrefab, _battleSkillViewPrefab.transform.parent);
@@ -100,35 +109,43 @@ public class BattleInterfaceController : MonoBehaviour
                     _battleSkillViews.Add(skillView);
                 }
 
-                _battleSkillViews[loop].Init(loop, currentTroop.UnitStats.skills[loop]);
+                _battleSkillViews[loop].Init(loop, currentTroop.Troop.UnitStats.skills[loop]);
                 _battleSkillViews[loop].onSkillSelect = OnSkillSelect;
                 _battleSkillViews[loop].gameObject.SetActive(true);
             }
         }
     }
+    #endregion
 
-    private void OnSkillSelect(int skillIndex, Skill selectedSkill)
+    private void OnSkillSelect(int skillIndex)
     {
-        if (_selectedSkill == skillIndex)
+        if (_selectedSkill > -1)
         {
             _battleSkillViews[_selectedSkill].SetSelected(false);
 
-            _battleController.SetAttackView();
-
-            _selectedSkill = -1;
-
-            return;
+            _battleSkillViews[skillIndex].SetSelected(_selectedSkill != skillIndex);
         }
+        else
+            _battleSkillViews[skillIndex].SetSelected(true);
 
-        _selectedSkill = skillIndex;
+        _selectedSkill = _selectedSkill != skillIndex ? skillIndex : -1;
 
-        _battleSkillViews[_selectedSkill].SetSelected(true);
+        onSkillSelect?.Invoke(_selectedSkill);
+    }
 
-        _battleController.SetAttackView(selectedSkill);
+    private void OnActionPerformed(string log)
+    {
+        _battleLog.text =$"{_battleLog.text}\n{log}\n";
     }
 
     public void OnAttackButtonClick()
     {
-        _battleController.PerformTurn();
+        onClickPerformTurnButton?.Invoke();
+    }
+
+    public void ShowDamageFly(string text, Vector3 fromPosition, Color color)
+    {
+        TextFly textFly = Instantiate<TextFly>(_damageTextFly).GetComponent<TextFly>();
+        textFly.Play(text, fromPosition, color);
     }
 }

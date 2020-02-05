@@ -16,3 +16,4 @@ MonoBehaviour:
   _usePower: 0.25
   _skillPower: 75
   _skillTarget: 1
+  _isMultiTarget: 0

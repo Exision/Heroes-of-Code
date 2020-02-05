@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class BattleController : MonoBehaviour
 {
-    public Action<int> onCurrentElementChanged;
+    public Action onCurrentElementChanged;
+    public Action<BattleQueueElement> onTroopAttack;
+    public Action<string> onActionPerformed;
 
     [SerializeField] private BattleInterfaceController _battleInterface;
 
@@ -16,11 +18,22 @@ public class BattleController : MonoBehaviour
     private List<BattleQueueElement> _playerGroup = new List<BattleQueueElement>();
     private List<BattleQueueElement> _enemyGroup = new List<BattleQueueElement>();
 
-    private int _currentQueueElement = 0;
     private int _selectedSkill = -1;
-    private BattleQueueElement _selectedTroops;
+    private List<BattleQueueElement> _selectedTroops = new List<BattleQueueElement>();
 
     private WaitForSeconds _animationWait = new WaitForSeconds(0.3f);
+
+    private void OnEnable()
+    {
+        _battleInterface.onClickPerformTurnButton += PerformTurn;
+        _battleInterface.onSkillSelect += OnSkillSelect;
+    }
+
+    private void OnDisable()
+    {
+        _battleInterface.onClickPerformTurnButton -= PerformTurn;
+        _battleInterface.onSkillSelect -= OnSkillSelect;
+    }
 
     private void Start()
     {
@@ -38,16 +51,12 @@ public class BattleController : MonoBehaviour
                 RaycastHit2D[] hits = Physics2D.RaycastAll(Camera.allCameras[1].ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity);
 
                 for (int loop = 0; loop < hits.Length; loop++)
-                {
-                    TroopObject troopObject = hits[loop].collider.gameObject.GetComponent<TroopObject>();
-
-                    if (troopObject != null)
-                        troopObject.OnClickTroop();
-                }
+                    hits[loop].collider.gameObject.GetComponent<TroopObject>()?.OnClickTroop();
             }
         }
     }
 
+    #region Initialization
     private void InitBattle()
     {
         InitPlayer();
@@ -65,9 +74,12 @@ public class BattleController : MonoBehaviour
 
         for (int loop = 0; loop < enemyTroops.Count; loop++)
         {
-            BattleQueueElement queueElement = new BattleQueueElement(enemyTroops[loop], enemyObjects[loop], BattleQueueElement.E_ElementTeam.Enemy);
-            queueElement.onSkillUsed = OnSkillUsed;
+            BattleQueueElement queueElement = new BattleQueueElement(enemyTroops[loop], enemyObjects[loop], E_BatteElementTeam.Enemy);
+            queueElement.onDamageReceived = OnDamageReceived;
+            queueElement.onHealReceived = OnHealReceived;
             queueElement.onClickTroop = OnClickTroop;
+            queueElement.onPerformAttack = OnPerformAttack;
+            queueElement.onSkillUsed = OnSkillUsed;
             queueElement.onTroopDied = OnTroopDied;
 
             _enemyGroup.Add(queueElement);
@@ -80,15 +92,19 @@ public class BattleController : MonoBehaviour
 
         for (int loop = 0; loop < playerObjects.Length; loop++)
         {
-            BattleQueueElement queueElement = new BattleQueueElement(GameController.Instance.PlayerData.Group[loop], playerObjects[loop], BattleQueueElement.E_ElementTeam.Player);
-            queueElement.onSkillUsed = OnSkillUsed;
+            BattleQueueElement queueElement = new BattleQueueElement(GameController.Instance.PlayerData.Group[loop], playerObjects[loop], E_BatteElementTeam.Player);
+            queueElement.onDamageReceived = OnDamageReceived;
+            queueElement.onHealReceived = OnHealReceived;
             queueElement.onClickTroop = OnClickTroop;
+            queueElement.onPerformAttack = OnPerformAttack;
+            queueElement.onSkillUsed = OnSkillUsed;
             queueElement.onTroopDied = OnTroopDied;
 
             _playerGroup.Add(queueElement);
         }
     }
 
+    // Создание очереди боя
     private void CreateQueue()
     {
         for (int loop = 0; loop < GameConfig.FindMultiple(_playerGroup.Count, _enemyGroup.Count); loop++)
@@ -98,20 +114,20 @@ public class BattleController : MonoBehaviour
             BattleQueue.Add(loop < _enemyGroup.Count ? _enemyGroup[loop] : _enemyGroup[loop % _enemyGroup.Count]);
         }
     }
+    #endregion
 
     private void SelectNextElement()
     {
-        if (_currentQueueElement >= BattleQueue.Count)
-            _currentQueueElement = 0;
+        onCurrentElementChanged?.Invoke();
 
-        onCurrentElementChanged?.Invoke(_currentQueueElement);
+        DeselectAll();
 
-        switch (BattleQueue[_currentQueueElement].Team)
+        switch (BattleQueue[0].Team)
         {
-            case BattleQueueElement.E_ElementTeam.Player:
+            case E_BatteElementTeam.Player:
                 ChangeState(E_BattleState.PlayerTurn);
                 break;
-            case BattleQueueElement.E_ElementTeam.Enemy:
+            case E_BatteElementTeam.Enemy:
                 ChangeState(E_BattleState.EnemyTurn);
                 break;
         }
@@ -124,24 +140,19 @@ public class BattleController : MonoBehaviour
         switch (_battleState)
         {
             case E_BattleState.PlayerTurn:
-                SetAttackView();
-
                 break;
             case E_BattleState.EnemyTurn:
                 EnemyTurn();
-
                 break;
             case E_BattleState.Waiting:
                 break;
         }
     }
-
+    
+    // Случайный ход для противника, в идеале должен быть свой контроллер для противников учитывающий тип юнита, информацию о битве и т.д., но в данном случае им пренебрегли
     private void EnemyTurn()
     {
-        StartCoroutine(EnemyTurnCoroutine());
-
-        /*
-        BattleQueueElement currentTroop = BattleQueue[_currentQueueElement];
+        BattleQueueElement currentTroop = BattleQueue[0];
 
         bool isHaveSkills = currentTroop.Troop.UnitStats.skills.Length > 0 && currentTroop.UsedSkills.Count != currentTroop.Troop.UnitStats.skills.Length;
 
@@ -157,56 +168,48 @@ public class BattleController : MonoBehaviour
                     skillTargets.AddRange(_playerGroup);
                     skillTargets.AddRange(_enemyGroup);
 
-                    currentTroop.UseSkill(skill, skillTargets, currentTroop.Troop.CurrentDamage));
+                    break;
+                case Skill.E_SkillUsageTarget.Enemy:
+                    skillTargets.Add(_playerGroup[UnityEngine.Random.Range(0, _playerGroup.Count)]);
 
                     break;
-                    /*
-                case Skill.E_SkillUsageTarget.Enemy:
-                case Skill.E_SkillUsageTarget.Player:
+                case Skill.E_SkillUsageTarget.Ally:
+                    skillTargets.Add(_enemyGroup[UnityEngine.Random.Range(0, _enemyGroup.Count)]);
+
+                    break;
             }
+
+            StartCoroutine(SkillAnimation(skill, BattleQueue[0], skillTargets));
         }
-
-        BattleQueueElement playerElement = _playerGroup[UnityEngine.Random.Range(0, _playerGroup.Count)];
-
-        playerElement.Troop.Attack(BattleQueue[_currentQueueElement].Troop.CurrentDamage);
-
-        onActionPerformed?.Invoke($"Team {BattleQueue[_currentQueueElement].Team} attack {playerElement.Troop.UnitStats.id} with {BattleQueue[_currentQueueElement].Troop.CurrentDamage} damage. HP left: {playerElement.Troop.CurrentHealth}");
-
-        EndTurn();
-
-        SelectNextElement();
-        */
-    }
-
-    private IEnumerator EnemyTurnCoroutine()
-    {
-        BattleQueueElement playerElement = _playerGroup[UnityEngine.Random.Range(0, _playerGroup.Count)];
-
-        yield return AttackAnimation(BattleQueue[_currentQueueElement], playerElement);
-
-        EndTurn();
-
-        SelectNextElement();
-
-        yield break;
+        else
+            StartCoroutine(AttackAnimation(BattleQueue[0], _playerGroup[UnityEngine.Random.Range(0, _playerGroup.Count)]));
     }
 
     public void PerformTurn()
     {
-        StartCoroutine(PerformTurnCoroutine());
-    }
-    
-    private IEnumerator PerformTurnCoroutine()
-    {
         if (_selectedTroops != null)
         {
             if (_selectedSkill >= 0)
-            {
-
-            }
+                StartCoroutine(SkillAnimation(BattleQueue[0].Troop.UnitStats.skills[_selectedSkill], BattleQueue[0], _selectedTroops));
             else
-                yield return AttackAnimation(BattleQueue[_currentQueueElement], _selectedTroops);
+                StartCoroutine(AttackAnimation(BattleQueue[0], _selectedTroops[0]));
         }
+    }
+
+    // Процесс атаки юнита
+    private IEnumerator AttackAnimation(BattleQueueElement performer, BattleQueueElement target)
+    {
+        Vector3 performerStartPosition = performer.TroopObject.transform.position;
+
+        performer.Move(target.TroopObject.transform.position + (target.Team == E_BatteElementTeam.Enemy ? Vector3.left : Vector3.right));
+
+        yield return _animationWait;
+
+        performer.Attack(target);
+
+        performer.Move(performerStartPosition);
+
+        yield return _animationWait;
 
         EndTurn();
 
@@ -215,37 +218,40 @@ public class BattleController : MonoBehaviour
         yield break;
     }
 
-    private IEnumerator AttackAnimation(BattleQueueElement performer, BattleQueueElement target)
+    // Использование способности (простейшая анимация и сама способность)
+    private IEnumerator SkillAnimation(Skill skill, BattleQueueElement performer, List<BattleQueueElement> targets)
     {
         Vector3 performerStartPosition = performer.TroopObject.transform.position;
 
-        performer.TroopObject.transform.position =
-            Vector3.MoveTowards(performer.TroopObject.transform.position,
-            target.TroopObject.transform.position + (target.Team == BattleQueueElement.E_ElementTeam.Enemy ? Vector3.left : Vector3.right),
-            GameConfig.Instance.unitSpeed);
+        performer.Move(performer.Team == E_BatteElementTeam.Player ? Vector3.right : Vector3.left);
 
         yield return _animationWait;
 
-        target.Troop.Attack(performer.Troop.CurrentDamage);
+        performer.UseSkill(skill, targets);
 
-        performer.TroopObject.transform.position = Vector3.MoveTowards(performer.TroopObject.transform.position, performerStartPosition, GameConfig.Instance.unitSpeed);
+        performer.Move(performerStartPosition);
 
         yield return _animationWait;
+
+        EndTurn();
+
+        SelectNextElement();
 
         yield break;
     }
 
+    // Перемещение юнита в конец списка, удаление двойных записей (один и тот же юнит несколько раз подряд)
     private void EndTurn()
     {
-        BattleQueueElement queueElement = BattleQueue[_currentQueueElement];
+        BattleQueueElement queueElement = BattleQueue[0];
 
-        if (_playerGroup.Count == 0 || _enemyGroup.Count == 0)
+        if (_playerGroup.Count <= 0 || _enemyGroup.Count <= 0)
             EndBattle();
 
         BattleQueue.Remove(queueElement);
         BattleQueue.Add(queueElement);
 
-        _selectedTroops = null;
+        _selectedTroops.Clear();
         _selectedSkill = -1;
 
         for (int loop = 0; loop < BattleQueue.Count - 1; loop++)
@@ -258,18 +264,7 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    private void OnTroopDied(BattleQueueElement troop)
-    {
-        BattleQueue.RemoveAll(item => item == troop);
-
-        Destroy(troop.TroopObject.gameObject);
-
-        if (troop.Team == BattleQueueElement.E_ElementTeam.Player)
-            _playerGroup.Remove(troop);
-        else
-            _enemyGroup.Remove(troop);
-    }
-
+    // Завершение боя, определение победителя
     private void EndBattle()
     {
         ChangeState(E_BattleState.Waiting);
@@ -305,99 +300,98 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    public void SetAttackView()
+
+    #region Objects view
+    public void SetAttackTroop(BattleQueueElement target)
+    {
+        for (int loop = 0; loop < _enemyGroup.Count; loop++)
+            _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(target == _enemyGroup[loop]);
+    }
+
+    public void SetAttackTroop(List<BattleQueueElement> targets)
+    {
+        for (int loop = 0; loop < _enemyGroup.Count; loop++)
+            _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(targets.Contains(_enemyGroup[loop]));
+    }
+
+    private void DeselectAll()
     {
         for (int loop = 0; loop < Mathf.Max(_playerGroup.Count, _enemyGroup.Count); loop++)
         {
             if (loop < _enemyGroup.Count)
-            {
-                _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(true);
-                _enemyGroup[loop].TroopObject.HighlightImage.color = Color.red;
-            }
+                _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(false);
 
             if (loop < _playerGroup.Count)
                 _playerGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(false);
         }
     }
+    #endregion
 
-    public void SetAttackTroop(BattleQueueElement queueElement)
+    #region Troops events
+    private void OnTroopDied(BattleQueueElement troop)
     {
-        for (int loop = 0; loop < _enemyGroup.Count; loop++)
-        {
-            _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(queueElement == _enemyGroup[loop]);
-        }
+        BattleQueue.RemoveAll(item => item == troop);
+
+        Destroy(troop.TroopObject.gameObject);
+
+        if (troop.Team == E_BatteElementTeam.Player)
+            _playerGroup.Remove(troop);
+        else
+            _enemyGroup.Remove(troop);
     }
 
-    public void SetAttackView(Skill activeSkill = null)
+    private void OnHealReceived(BattleQueueElement target, int healAmount)
     {
-        if (activeSkill != null)
-            _selectedSkill = activeSkill.Id;
-
-        switch (activeSkill.SkillTarget)
-        {
-            case Skill.E_SkillUsageTarget.All:
-                for (int loop = 0; loop < Mathf.Max(_playerGroup.Count, _enemyGroup.Count); loop++)
-                {
-                    if (loop < _enemyGroup.Count)
-                    {
-                        _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(true);
-                        _enemyGroup[loop].TroopObject.HighlightImage.color = Color.red;
-                    }
-
-                    if (loop < _playerGroup.Count)
-                    {
-                        _playerGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(true);
-                        _playerGroup[loop].TroopObject.HighlightImage.color = Color.red;
-                    }
-                }
-
-                break;
-            case Skill.E_SkillUsageTarget.Enemy:
-                for (int loop = 0; loop < Mathf.Max(_playerGroup.Count, _enemyGroup.Count); loop++)
-                {
-                    if (loop < _enemyGroup.Count)
-                    {
-                        _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(true);
-                        _enemyGroup[loop].TroopObject.HighlightImage.color = Color.red;
-                    }
-
-                    if (loop < _playerGroup.Count)
-                        _playerGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(false);
-                }
-
-                break;
-            case Skill.E_SkillUsageTarget.Player:
-                for (int loop = 0; loop < Mathf.Max(_playerGroup.Count, _enemyGroup.Count); loop++)
-                {
-                    if (loop < _enemyGroup.Count)
-                        _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(false);
-
-                    if (loop < _playerGroup.Count)
-                    {
-                        _playerGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(true);
-                        _playerGroup[loop].TroopObject.HighlightImage.color = Color.green;
-                    }
-                }
-
-                break;
-        }
+        _battleInterface.ShowDamageFly(healAmount.ToString(), target.TroopObject.transform.position, Color.green);
     }
 
-    private void OnSkillUsed()
+    private void OnDamageReceived(BattleQueueElement target, int damage)
     {
+        _battleInterface.ShowDamageFly(damage.ToString(), target.TroopObject.transform.position, Color.red);
+    }
 
+    private void OnPerformAttack(BattleQueueElement target, int damage)
+    {
+        onActionPerformed?.Invoke(string.Format(Localization.Instance.Get("action_log_attack"),
+            Localization.Instance.Get("unit_name_" + BattleQueue[0].Troop.UnitStats.id),
+            BattleQueue[0].Team.ToString(),
+            Localization.Instance.Get("unit_name_" + target.Troop.UnitStats.id),
+            target.Team.ToString(),
+            damage,
+            target.Troop.CurrentHealth));
+    }
+
+    private void OnSkillUsed(Skill skill)
+    {
+        onActionPerformed?.Invoke(string.Format(Localization.Instance.Get("action_log_skill"),
+            Localization.Instance.Get("unit_name_" + BattleQueue[0].Troop.UnitStats.id),
+            BattleQueue[0].Team.ToString(),
+            Localization.Instance.Get("skill_name_" + skill.Id)));
     }
 
     private void OnClickTroop(BattleQueueElement selectedTroop)
     {
-        if (_battleState != E_BattleState.PlayerTurn)
+        if (_battleState != E_BattleState.PlayerTurn
+            || (selectedTroop.Team == E_BatteElementTeam.Player && (_selectedSkill <= -1 || BattleQueue[0].Troop.UnitStats.skills[_selectedSkill].SkillTarget != Skill.E_SkillUsageTarget.Ally))
+            || (selectedTroop.Team != E_BatteElementTeam.Player && (_selectedSkill > -1 && BattleQueue[0].Troop.UnitStats.skills[_selectedSkill].SkillTarget == Skill.E_SkillUsageTarget.Ally)))
             return;
 
-        if (_selectedSkill == -1)
-        {
-            _selectedTroops = selectedTroop;
+        if (_selectedSkill <= -1
+            || (_selectedSkill > -1 && !BattleQueue[0].Troop.UnitStats.skills[_selectedSkill].IsMultiTarget))
+            _selectedTroops.Clear();
 
-            SetAttackTroop(selectedTroop);
-        }
+        _selectedTroops.Add(selectedTroop);
+
+        SetAttackTroop(selectedTroop);
     }
+
+    private void OnSkillSelect(int skillId)
+    {
+        _selectedSkill = skillId;
+
+        _selectedTroops.Clear();
+
+        DeselectAll();
+    }
+    #endregion
 }

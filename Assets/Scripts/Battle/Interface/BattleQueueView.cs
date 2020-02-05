@@ -16,7 +16,7 @@ public class BattleQueueView : MonoBehaviour
         _battleElement = element;
 
         _troopImage.sprite = Resources.Load<Sprite>($"{GameConfig.Instance.troopsImagePath}TroopIcon_{_battleElement.Troop.UnitStats.id}");
-        _viewBackground.color = _battleElement.Team == BattleQueueElement.E_ElementTeam.Player ? Color.white : Color.red;
+        _viewBackground.color = _battleElement.Team == E_BatteElementTeam.Player ? Color.white : Color.red;
 
         SetSelected(false);
     }

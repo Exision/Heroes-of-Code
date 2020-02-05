@@ -34,12 +34,6 @@ public class MapInterfaceController : MonoBehaviour
         _interfaceTilemap.SetTile(tilePosition, null);
     }
 
-    public void CleanPath()
-    {
-        for (int loop = 0; loop < _currentPath.Count; loop++)
-            _interfaceTilemap.SetTile(_currentPath[loop].TilemapPosition, null);
-    }
-
     public void OnClickCreateGroup()
     {
         CreateGroupWindow createGroupWindow = WindowManager.Instance.GetWindow<CreateGroupWindow>();

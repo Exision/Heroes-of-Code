@@ -18,9 +18,6 @@ public class GameConfig : SingletonScriptableObject<GameConfig>
     public Vector3 enemyTroopScale;
     public float enemyUseSkillChance;
 
-    [Header("Battle UI Settings")]
-    public int maxQueueElementsCount;
-
     [Header("Units Stats")]
     public float unitSpeed;
     public float unitChanceToFindPath;
