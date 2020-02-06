@@ -20,7 +20,7 @@ public class BattleSkillView : MonoBehaviour
         _index = index;
 
         _skillName.text = Localization.Instance.Get("skill_name_" + skill.Id);
-        _skillDescription.text = Localization.Instance.Get("skill_desc_" + skill.Id);
+        _skillDescription.text = string.Format(Localization.Instance.Get("skill_desc_" + skill.Id), skill.Modificator, skill.Power);
         _skillIcon.sprite = Resources.Load<Sprite>($"{GameConfig.Instance.skillImagePath}SkillIcon_{skill.Id}");
 
         SetSelected(false);

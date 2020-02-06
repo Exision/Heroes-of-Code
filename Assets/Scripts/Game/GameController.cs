@@ -72,7 +72,7 @@ public class GameController : SingletonMonoBehaviour<GameController>
 
             SceneLoader.Instance.LoadScene(GameConfig.BATTLE_SCENE_PATH);
         };
-        messageWindow.Show($"Fight with enemy {enemyGroup}, troops count {EnemysDatas[enemyGroup].Group.Count}, first is {EnemysDatas[enemyGroup].Group[0].UnitStats.id}");
+        messageWindow.Show(Localization.Instance.Get("start_fight"));
     }
 
     public void EndBattle(List<Troop> group)

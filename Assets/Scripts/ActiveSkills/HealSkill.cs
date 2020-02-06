@@ -8,6 +8,6 @@ public class HealSkill : Skill
     public override void Use(BattleQueueElement performer, List<BattleQueueElement> targets)
     {
         if (targets.Count > 0)
-            targets[0].Troop.Heal(targets[0].Troop.UnitStats.health * Modificator);
+            targets[0].Troop.Heal(targets[0].Troop.UnitStats.health * Modificator / 100f);
     }
 }

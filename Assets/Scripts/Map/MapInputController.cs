@@ -11,7 +11,7 @@ public class MapInputController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && _eventSystem.currentSelectedGameObject == null)
+        if (Input.GetMouseButtonDown(0) && _eventSystem.currentSelectedGameObject == null && WindowManager.Instance.OpenWindowsCount() == 0)
             onPositionSelected?.Invoke(_sceneCamera.ScreenToWorldPoint(Input.mousePosition));
     }
 }

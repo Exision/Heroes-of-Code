@@ -122,6 +122,8 @@ public class BattleController : MonoBehaviour
 
         DeselectAll();
 
+        BattleQueue[0].TroopObject.ActiveImage.gameObject.SetActive(true);
+
         switch (BattleQueue[0].Team)
         {
             case E_BatteElementTeam.Player:
@@ -187,12 +189,31 @@ public class BattleController : MonoBehaviour
 
     public void PerformTurn()
     {
-        if (_selectedTroops != null)
+        if (_selectedTroops.Count > 0)
         {
             if (_selectedSkill >= 0)
+            {
+                if (BattleQueue[0].Troop.UnitStats.skills[_selectedSkill].SkillTarget == Skill.E_SkillUsageTarget.All)
+                {
+                    _selectedTroops.Clear();
+
+                    _selectedTroops.AddRange(_playerGroup);
+                    _selectedTroops.AddRange(_enemyGroup);
+                }
+
                 StartCoroutine(SkillAnimation(BattleQueue[0].Troop.UnitStats.skills[_selectedSkill], BattleQueue[0], _selectedTroops));
+            }
             else
                 StartCoroutine(AttackAnimation(BattleQueue[0], _selectedTroops[0]));
+        }
+        else
+        {
+            MessageWindow messageWindow = WindowManager.Instance.GetWindow<MessageWindow>();
+            messageWindow.onClickOkButton = () =>
+            {
+                messageWindow.Hide();
+            };
+            messageWindow.Show(Localization.Instance.Get("battle_select_enemy"));
         }
     }
 
@@ -244,6 +265,8 @@ public class BattleController : MonoBehaviour
     private void EndTurn()
     {
         BattleQueueElement queueElement = BattleQueue[0];
+
+        queueElement.TroopObject.ActiveImage.gameObject.SetActive(false);
 
         if (_playerGroup.Count <= 0 || _enemyGroup.Count <= 0)
             EndBattle();
@@ -302,10 +325,21 @@ public class BattleController : MonoBehaviour
 
 
     #region Objects view
-    public void SetAttackTroop(BattleQueueElement target)
+    public void SetTroopSelected(BattleQueueElement target)
     {
-        for (int loop = 0; loop < _enemyGroup.Count; loop++)
-            _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(target == _enemyGroup[loop]);
+        switch (target.Team)
+        {
+            case E_BatteElementTeam.Player:
+                for (int loop = 0; loop < _playerGroup.Count; loop++)
+                    _playerGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(_selectedTroops.Contains(_playerGroup[loop]));
+
+                break;
+            case E_BatteElementTeam.Enemy:
+                for (int loop = 0; loop < _enemyGroup.Count; loop++)
+                    _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(_selectedTroops.Contains(_enemyGroup[loop]));
+
+                break;
+        }
     }
 
     public void SetAttackTroop(List<BattleQueueElement> targets)
@@ -380,9 +414,12 @@ public class BattleController : MonoBehaviour
             || (_selectedSkill > -1 && !BattleQueue[0].Troop.UnitStats.skills[_selectedSkill].IsMultiTarget))
             _selectedTroops.Clear();
 
-        _selectedTroops.Add(selectedTroop);
+        if (!_selectedTroops.Contains(selectedTroop))
+            _selectedTroops.Add(selectedTroop);
+        else
+            _selectedTroops.Remove(selectedTroop);
 
-        SetAttackTroop(selectedTroop);
+        SetTroopSelected(selectedTroop);
     }
 
     private void OnSkillSelect(int skillId)

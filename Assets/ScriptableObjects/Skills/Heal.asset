@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Heal
   m_EditorClassIdentifier: 
   _id: 1
-  _usePower: 0.6
+  _usePower: 60
   _skillPower: 0
   _skillTarget: 2
   _isMultiTarget: 0

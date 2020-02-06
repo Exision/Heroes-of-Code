@@ -53,21 +53,21 @@ public class Troop : ITroop
     {
         CurrentHealth -= Mathf.RoundToInt(damage);
 
+        UpdateData();
+
         onDamageReceived?.Invoke(Mathf.RoundToInt(damage));
 
         if (CurrentHealth <= 0)
             onTroopDied?.Invoke();
-
-        UpdateData();
     }
 
     public void Heal(float healAmount)
     {
         CurrentHealth += Mathf.RoundToInt(healAmount);
 
-        onHealReceived?.Invoke(Mathf.RoundToInt(healAmount));
-
         UpdateData();
+
+        onHealReceived?.Invoke(Mathf.RoundToInt(healAmount));
     }
 
     private void UpdateData()

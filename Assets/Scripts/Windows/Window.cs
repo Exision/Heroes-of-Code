@@ -26,6 +26,8 @@ public class Window : MonoBehaviour
     {
         gameObject.SetActive(true);
 
+        WindowManager.Instance.AddWindowToTurn(this);
+
         if (_animator != null)
             _animator.enabled = false;
         else
@@ -54,6 +56,8 @@ public class Window : MonoBehaviour
         }
         else
             OnEndHideAnimation();
+
+        WindowManager.Instance.RemoveWindowOfTurn(this);
 
         onEndShowAnimation = null;
 

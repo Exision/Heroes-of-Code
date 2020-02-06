@@ -16,7 +16,7 @@ public class EnemyFactory : MonoBehaviour, ITroopObjectsFactory
             TroopObject tObject = Instantiate<TroopObject>(Resources.Load<TroopObject>($"{GameConfig.Instance.troopsPrefabsPath}Troop_{troops[loop].UnitStats.id}"));
 
             tObject.transform.position = GetPosition(loop);
-            tObject.transform.localScale = GameConfig.Instance.enemyTroopScale;
+            tObject.UnitSprite.flipX = true;
 
             createdTroops.Add(tObject);
         }

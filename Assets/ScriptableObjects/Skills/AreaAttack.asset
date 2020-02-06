@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: 0
   _usePower: 0.75
-  _skillPower: 0
+  _skillPower: 150
   _skillTarget: 1
   _isMultiTarget: 1

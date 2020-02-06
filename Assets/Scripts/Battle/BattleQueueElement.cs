@@ -28,6 +28,9 @@ public class BattleQueueElement
         Troop.onDamageReceived = OnDamageReceived;
         Troop.onHealReceived = OnHealReceived;
         Troop.onTroopDied = OnTroopDied;
+
+        TroopObject.UnitsCount.text = Troop.UnitsCount.ToString();
+        TroopObject.ActiveImage.gameObject.SetActive(false);
     }
 
     public void UseSkill(Skill skill, List<BattleQueueElement> targets)
@@ -81,11 +84,15 @@ public class BattleQueueElement
     private void OnTroopDied()
     {
         onTroopDied?.Invoke(this);
+
+        TroopObject.UnitsCount.text = Troop.UnitsCount.ToString();
     }
 
     private void OnDamageReceived(int damage)
     {
         onDamageReceived?.Invoke(this, damage);
+
+        TroopObject.UnitsCount.text = Troop.UnitsCount.ToString();
     }
 
     private void OnHealReceived(int healAmount)

@@ -10,7 +10,7 @@ public class AreaAttackSkill : Skill
         if (targets.Count > 0)
         {
             foreach (BattleQueueElement target in targets)
-                target.Troop.DealDamage(performer.Troop.CurrentDamage * Modificator);
+                target.Troop.DealDamage(Power);
         }
     }
 }
