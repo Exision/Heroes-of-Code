@@ -232,7 +232,8 @@ public class BattleController : MonoBehaviour
 
         yield return _animationWait;
 
-        EndTurn();
+        if (!CheckEndTurn())
+            yield break;
 
         SelectNextElement();
 
@@ -254,22 +255,27 @@ public class BattleController : MonoBehaviour
 
         yield return _animationWait;
 
-        EndTurn();
+        if (!CheckEndTurn())
+            yield break;
 
         SelectNextElement();
 
         yield break;
     }
 
-    // Перемещение юнита в конец списка, удаление двойных записей (один и тот же юнит несколько раз подряд)
-    private void EndTurn()
+    // Проверка на конец боя. Перемещение юнита в конец списка, удаление двойных записей (один и тот же юнит несколько раз подряд)
+    private bool CheckEndTurn()
     {
+        if (_playerGroup.Count <= 0 || _enemyGroup.Count <= 0)
+        {
+            EndBattle();
+
+            return false;
+        }
+
         BattleQueueElement queueElement = BattleQueue[0];
 
         queueElement.TroopObject.ActiveImage.gameObject.SetActive(false);
-
-        if (_playerGroup.Count <= 0 || _enemyGroup.Count <= 0)
-            EndBattle();
 
         BattleQueue.Remove(queueElement);
         BattleQueue.Add(queueElement);
@@ -285,6 +291,8 @@ public class BattleController : MonoBehaviour
             if (BattleQueue[loop] == BattleQueue[loop + 1])
                 BattleQueue.RemoveAt(loop + 1);
         }
+
+        return true;
     }
 
     // Завершение боя, определение победителя
@@ -311,16 +319,7 @@ public class BattleController : MonoBehaviour
             messageWindow.Show(Localization.Instance.Get("win"));
         }
         else
-        {
-            MessageWindow messageWindow = WindowManager.Instance.GetWindow<MessageWindow>();
-            messageWindow.onClickOkButton = () =>
-            {
-                messageWindow.Hide();
-
                 GameController.Instance.EndGame();
-            };
-            messageWindow.Show(Localization.Instance.Get("lose"));
-        }
     }
 
 
