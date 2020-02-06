@@ -7,6 +7,10 @@ public class GameConfig : SingletonScriptableObject<GameConfig>
     public const string MAP_SCENE_PATH = "Scenes/MapScene";
     public const string BATTLE_SCENE_PATH = "Scenes/BattleScene";
 
+    [Header("Game Settings")]
+    public int minEnemyUnitsCount;
+    public int maxEnemyUnitsCount;
+
     [Header("Map Settings")]
     public int enemysCount;
     public Vector3 playerStartPosition;

@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb1ae7a5bedaf164a8042096eb7ae75f, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
+  minEnemyUnitsCount: 50
+  maxEnemyUnitsCount: 200
   enemysCount: 3
   playerStartPosition: {x: -8, y: -8, z: 0}
   basePlayerGroupPosition: {x: -6, y: 0}

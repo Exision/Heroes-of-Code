@@ -51,7 +51,7 @@ public class GameController : SingletonMonoBehaviour<GameController>
             for (int troopIndex = 0; troopIndex < enemyTroopsCount; troopIndex++)
             {
                 int randomTroopIndex = UnityEngine.Random.Range(0, allTroops.Count);
-                Troop troop = new Troop(allTroops[randomTroopIndex], UnityEngine.Random.Range(50, 200));
+                Troop troop = new Troop(allTroops[randomTroopIndex], UnityEngine.Random.Range(GameConfig.Instance.minEnemyUnitsCount, GameConfig.Instance.maxEnemyUnitsCount));
 
                 troops.Add(troop);
                 allTroops.Remove(allTroops[randomTroopIndex]);
