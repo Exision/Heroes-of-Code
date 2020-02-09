@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -25,7 +24,7 @@ public class MapInterfaceController : MonoBehaviour
         {
             _interfaceTilemap.SetTile(_currentPath[loop].TilemapPosition, _highlightTile);
             _interfaceTilemap.SetTileFlags(_currentPath[loop].TilemapPosition, TileFlags.None);
-            _interfaceTilemap.SetColor(_currentPath[loop].TilemapPosition, loop == _currentPath.Count - 1? Color.blue : Color.white);
+            _interfaceTilemap.SetColor(_currentPath[loop].TilemapPosition, loop == _currentPath.Count - 1 ? Color.blue : Color.white);
         }
     }
 

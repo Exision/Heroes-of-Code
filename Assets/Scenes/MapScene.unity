@@ -709,6 +709,7 @@ MonoBehaviour:
   _grid: {fileID: 2050978146}
   _mapInterfaceController: {fileID: 1539761213}
   _mapChipController: {fileID: 1539761217}
+  _mapInputController: {fileID: 1539761214}
 --- !u!114 &1539761217
 MonoBehaviour:
   m_ObjectHideFlags: 0

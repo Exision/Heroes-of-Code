@@ -1,8 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class TextFly : MonoBehaviour 
+public class TextFly : MonoBehaviour
 {
     [SerializeField] private TextMesh _text;
 

@@ -6,7 +6,7 @@ public class Node : IHeapItem<Node>
     public bool Walkable { get; private set; }
     public int Penalty { get; private set; }
     public Vector3 WorldPosition { get; private set; }
-    public Vector3Int TilemapPosition { get; private set; } 
+    public Vector3Int TilemapPosition { get; private set; }
     #endregion
 
     #region Grid properties

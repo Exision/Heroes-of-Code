@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MapChipManager : MonoBehaviour
@@ -12,7 +11,7 @@ public class MapChipManager : MonoBehaviour
     {
         _enemysDatas.Clear();
 
-        foreach(EnemyData enemy in GameController.Instance.EnemysDatas)
+        foreach (EnemyData enemy in GameController.Instance.EnemysDatas)
         {
             if (GameController.Instance.DefeatedEnemys.Contains(enemy))
                 continue;

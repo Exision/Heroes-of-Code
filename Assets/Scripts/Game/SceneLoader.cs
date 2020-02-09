@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,7 +14,7 @@ public class SceneLoader : SingletonMonoBehaviour<SceneLoader>
         base.Awake();
 
         DontDestroyOnLoad(this);
-            
+
         SceneManager.sceneLoaded += (Scene scene, LoadSceneMode loadSceneMode) =>
         {
             SceneManager.SetActiveScene(scene);

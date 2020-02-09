@@ -1,4 +1,4 @@
-﻿public class Heap<T> where T: IHeapItem<T>
+﻿public class Heap<T> where T : IHeapItem<T>
 {
     public int Count { get; private set; }
 

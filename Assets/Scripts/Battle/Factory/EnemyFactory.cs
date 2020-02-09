@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyFactory : MonoBehaviour, ITroopObjectsFactory
-{ 
+public class EnemyFactory : ITroopObjectsFactory
+{
     public TroopObject[] Create(List<Troop> troops)
     {
         List<TroopObject> createdTroops = new List<TroopObject>();
@@ -13,7 +12,7 @@ public class EnemyFactory : MonoBehaviour, ITroopObjectsFactory
 
         for (int loop = 0; loop < troops.Count; loop++)
         {
-            TroopObject tObject = Instantiate<TroopObject>(Resources.Load<TroopObject>($"{GameConfig.Instance.troopsPrefabsPath}Troop_{troops[loop].UnitStats.id}"));
+            TroopObject tObject = MonoBehaviour.Instantiate<TroopObject>(Resources.Load<TroopObject>($"{GameConfig.Instance.troopsPrefabsPath}Troop_{troops[loop].UnitStats.id}"));
 
             tObject.transform.position = GetPosition(loop);
             tObject.UnitSprite.flipX = true;

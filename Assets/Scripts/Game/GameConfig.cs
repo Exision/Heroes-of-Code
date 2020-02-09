@@ -19,7 +19,6 @@ public class GameConfig : SingletonScriptableObject<GameConfig>
     public Vector2 basePlayerGroupPosition;
     public Vector2 baseEnemyGroupPosition;
     public Vector2 groupPositionOffset;
-    public Vector3 enemyTroopScale;
     public float enemyUseSkillChance;
 
     [Header("Units Stats")]

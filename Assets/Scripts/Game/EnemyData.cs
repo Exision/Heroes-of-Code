@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyData
@@ -8,7 +7,7 @@ public class EnemyData
     public List<Troop> Group { get; private set; } = new List<Troop>();
     public Vector3? Position { get; set; } = null;
 
-    public EnemyData (int id, List<Troop> group)
+    public EnemyData(int id, List<Troop> group)
     {
         Id = id;
         Group = group;

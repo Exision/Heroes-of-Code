@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -59,7 +58,7 @@ public class BattleQueueElement
 
     public void Attack(BattleQueueElement target)
     {
-        int damage = 0; 
+        int damage = 0;
         int hpLeft = target.Troop.CurrentHealth - Troop.CurrentDamage;
 
         damage = hpLeft < 0 ? Troop.CurrentDamage + hpLeft : Troop.CurrentDamage;

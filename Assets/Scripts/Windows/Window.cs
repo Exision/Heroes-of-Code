@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Window : MonoBehaviour
@@ -57,11 +55,7 @@ public class Window : MonoBehaviour
         else
             OnEndHideAnimation();
 
-        WindowManager.Instance.RemoveWindowOfTurn(this);
-
         onEndShowAnimation = null;
-
-        Destroy(gameObject);
     }
 
     public virtual void OnEndShowAnimation()
@@ -82,6 +76,10 @@ public class Window : MonoBehaviour
         onEndHideAnimation?.Invoke();
 
         onEndHideAnimation = null;
+
+        WindowManager.Instance.RemoveWindowOfTurn(this);
+
+        Destroy(gameObject);
     }
 
     public virtual void OnClickCloseButton()

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(BattleInputController))]
+[RequireComponent(typeof(BattleInterfaceController))]
 public class BattleController : MonoBehaviour
 {
     public Action onCurrentElementChanged;
@@ -25,13 +27,13 @@ public class BattleController : MonoBehaviour
 
     private void OnEnable()
     {
-        _battleInterface.onClickPerformTurnButton += PerformTurn;
+        _battleInterface.onClickPerformTurnButton += OnClickPerformTurn;
         _battleInterface.onSkillSelect += OnSkillSelect;
     }
 
     private void OnDisable()
     {
-        _battleInterface.onClickPerformTurnButton -= PerformTurn;
+        _battleInterface.onClickPerformTurnButton -= OnClickPerformTurn;
         _battleInterface.onSkillSelect -= OnSkillSelect;
     }
 
@@ -40,20 +42,6 @@ public class BattleController : MonoBehaviour
         InitBattle();
 
         SelectNextElement();
-    }
-
-    private void Update()
-    {
-        if (_battleState == E_BattleState.PlayerTurn)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                RaycastHit2D[] hits = Physics2D.RaycastAll(Camera.allCameras[1].ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity);
-
-                for (int loop = 0; loop < hits.Length; loop++)
-                    hits[loop].collider.gameObject.GetComponent<TroopObject>()?.OnClickTroop();
-            }
-        }
     }
 
     #region Initialization
@@ -150,8 +138,9 @@ public class BattleController : MonoBehaviour
                 break;
         }
     }
-    
-    // Случайный ход для противника, в идеале должен быть свой контроллер для противников учитывающий тип юнита, информацию о битве и т.д., но в данном случае им пренебрегли
+
+    // Случайный ход для противника, в идеале должен быть свой контроллер для противников учитывающий тип юнита, информацию о битве и т.д., но в данном случае я им пренебрег
+    // Есть простая логика применения способностей противником, но т.к. по ТЗ это не нужно, я просто выставил шанс на применение 0
     private void EnemyTurn()
     {
         BattleQueueElement currentTroop = BattleQueue[0];
@@ -187,7 +176,7 @@ public class BattleController : MonoBehaviour
             StartCoroutine(AttackAnimation(BattleQueue[0], _playerGroup[UnityEngine.Random.Range(0, _playerGroup.Count)]));
     }
 
-    public void PerformTurn()
+    public void OnClickPerformTurn()
     {
         if (_selectedTroops.Count > 0)
         {
@@ -319,7 +308,7 @@ public class BattleController : MonoBehaviour
             messageWindow.Show(Localization.Instance.Get("win"));
         }
         else
-                GameController.Instance.EndGame();
+            GameController.Instance.EndGame();
     }
 
 
@@ -339,12 +328,6 @@ public class BattleController : MonoBehaviour
 
                 break;
         }
-    }
-
-    public void SetAttackTroop(List<BattleQueueElement> targets)
-    {
-        for (int loop = 0; loop < _enemyGroup.Count; loop++)
-            _enemyGroup[loop].TroopObject.HighlightImage.gameObject.SetActive(targets.Contains(_enemyGroup[loop]));
     }
 
     private void DeselectAll()

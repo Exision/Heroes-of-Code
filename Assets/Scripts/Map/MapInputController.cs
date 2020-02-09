@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class MapInputController : MonoBehaviour
 {
-    public static Action<Vector3> onPositionSelected;
+    public Action<Vector3> onPositionSelected;
 
     [SerializeField] private Camera _sceneCamera;
     [SerializeField] private EventSystem _eventSystem;

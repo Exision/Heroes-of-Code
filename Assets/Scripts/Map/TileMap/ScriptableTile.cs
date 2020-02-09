@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [CreateAssetMenu(fileName = "Scriptable Tile", menuName = "Tiles/Scriptable Tile")]
@@ -11,5 +9,5 @@ public class ScriptableTile : Tile
 
     public bool IsWalkable { get => _isWalkable; }
 
-    public int Penalty { get => _penalty; }   
+    public int Penalty { get => _penalty; }
 }

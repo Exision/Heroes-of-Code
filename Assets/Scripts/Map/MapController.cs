@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapController : SingletonMonoBehaviour<MapController>
+[RequireComponent(typeof(MapInterfaceController))]
+[RequireComponent(typeof(MapInputController))]
+[RequireComponent(typeof(MapChipManager))]
+public class MapController : MonoBehaviour
 {
     [SerializeField] private PlayerMapChip _player;
     [SerializeField] private Grid _grid;
     [SerializeField] private MapInterfaceController _mapInterfaceController;
     [SerializeField] private MapChipManager _mapChipController;
+    [SerializeField] private MapInputController _mapInputController;
 
     public E_MapGameState CurrentGameState { get; private set; }
 
@@ -16,14 +19,14 @@ public class MapController : SingletonMonoBehaviour<MapController>
 
     private void OnEnable()
     {
-        MapInputController.onPositionSelected += OnPositionSelected;
+        _mapInputController.onPositionSelected += OnPositionSelected;
 
         _player.onMoveDone += OnPlayerMoveDone;
     }
 
     private void OnDisable()
     {
-        MapInputController.onPositionSelected -= OnPositionSelected;
+        _mapInputController.onPositionSelected -= OnPositionSelected;
 
         _player.onMoveDone -= OnPlayerMoveDone;
     }
@@ -94,7 +97,7 @@ public class MapController : SingletonMonoBehaviour<MapController>
             _player.Move();
 
             _mapChipController.TryMoveUnits();
-            
+
             if (_mapChipController.IsNeighbour(_player.transform.position, out int enemyId))
             {
                 ChangeGameState(E_MapGameState.Waiting);

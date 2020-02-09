@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -135,7 +134,7 @@ public class BattleInterfaceController : MonoBehaviour
 
     private void OnActionPerformed(string log)
     {
-        _battleLog.text =$"{_battleLog.text}\n{log}\n";
+        _battleLog.text = $"{_battleLog.text}\n{log}\n";
     }
 
     public void OnAttackButtonClick()

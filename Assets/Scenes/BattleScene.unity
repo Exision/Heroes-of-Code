@@ -414,6 +414,7 @@ GameObject:
   - component: {fileID: 360710299}
   - component: {fileID: 360710298}
   - component: {fileID: 360710300}
+  - component: {fileID: 360710301}
   m_Layer: 0
   m_Name: Scripts
   m_TagString: Untagged
@@ -465,6 +466,19 @@ MonoBehaviour:
   _battleLog: {fileID: 944039813}
   _damageTextFly: {fileID: 5115440109384122372, guid: d0747a5d04ac1d940896e9ddcf915e69,
     type: 3}
+--- !u!114 &360710301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 360710297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c274e4d130108214f8e198123a0c6350, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sceneCamera: {fileID: 519420031}
 --- !u!1 &369116771
 GameObject:
   m_ObjectHideFlags: 0

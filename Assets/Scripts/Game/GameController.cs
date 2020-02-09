@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(UnitsStorage))]
 public class GameController : SingletonMonoBehaviour<GameController>
 {
     [SerializeField] private UnitsStorage _unitsStorage;

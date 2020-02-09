@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class PreloaderWindow : Window
+﻿public class PreloaderWindow : Window
 {
     public bool IsLoaded { get; private set; }
 

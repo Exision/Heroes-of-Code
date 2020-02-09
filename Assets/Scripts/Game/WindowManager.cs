@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class WindowManager : SingletonMonoBehaviour<WindowManager>
@@ -15,7 +14,7 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
         DontDestroyOnLoad(gameObject);
     }
 
-    public T GetWindow<T>() where T: Window
+    public T GetWindow<T>() where T : Window
     {
         T loadedWindow = Resources.Load<T>("Windows/" + typeof(T).Name);
 
